@@ -1,4 +1,4 @@
-# Cars Market
+# Cars Market (built by [AutoCode](https://autocode.work) in 20 minutes)
 
 ## Overview
 
@@ -18,7 +18,12 @@ Cars Market is a web application for browsing and searching cars. It utilizes Re
 
 ```
 cars-market/
+├── docker-compose.yml
+├── Dockerfile
+├── grafana-dashboard.json
+├── landing.html
 ├── package.json
+├── prometheus.yml
 ├── public/
 │   └── index.html
 ├── src/
@@ -44,6 +49,7 @@ cars-market/
 10. Implement a chat feature for buyers and sellers
 11. Add a review and rating system for cars and sellers
 12. Implement geolocation-based search and filtering
+13. Implement a notification system for price changes and new listings
 
 ## Design Considerations
 
@@ -52,8 +58,19 @@ cars-market/
 3. Implement a CI/CD pipeline for automated testing and deployment
 4. Use containerization with Docker for easier deployment and scaling
 5. Implement rate limiting and security measures to prevent abuse
+6. Implement A/B testing for UI/UX improvements
+7. Use performance monitoring tools like Prometheus and Grafana for real-time insights
 
-# TODO
+## Monitoring and Analytics
 
--   add car images (from unsplash or google search)
--   add nice landing page with designs and sleek and some car images hero
+-   Utilize Prometheus for metrics collection and monitoring
+-   Implement Grafana dashboards for visualizing application performance and user behavior
+-   Set up logging and error tracking systems for better debugging and issue resolution
+
+## TODO
+
+-   Add car images (from Google search by model)
+-   Improve overall design and user experience
+-   Implement responsive design for mobile devices
+-   Set up Docker containers for development and production environments
+-   Implement user authentication and authorization system
