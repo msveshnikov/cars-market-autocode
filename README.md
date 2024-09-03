@@ -40,5 +40,5 @@ cars-market/
 
 # TODO
 
--   show car images also in search window (similar to card view)
--   fix dark thene
+-   show skeleton car images
+-   fix dark thene to fully change all screen
