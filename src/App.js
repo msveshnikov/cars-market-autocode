@@ -33,66 +33,36 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 const App = () => {
     const year = useInput("");
-    const [brand, setBrand] = useState("ford");
+    const [brand, setBrand] = useState("");
     const model = useInput("");
-    const [vehicle, setVehicle] = useState("limousine");
-    const [gearbox, setGearbox] = useState("manuell");
+    const [vehicle, setVehicle] = useState("");
+    const [gearbox, setGearbox] = useState("");
     const kilo = useInput("");
     const power = useInput("");
-    const [fueltype, setFueltype] = useState("benzin");
-    const [notrepaireddamage, setNotrepaireddamage] = useState("nein");
+    const [fueltype, setFueltype] = useState("");
+    const [notrepaireddamage, setNotrepaireddamage] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [darkMode, setDarkMode] = useState(false);
     const [drawerOpen, setDrawerOpen] = useState(false);
-
-    const brands = [
-        "volkswagen",
-        "sonstige_autos",
-        "lancia",
-        "ford",
-        "opel",
-        "mercedes_benz",
-        "toyota",
-        "audi",
-        "bmw",
-        "mitsubishi",
-        "fiat",
-        "nissan",
-        "renault",
-        "mazda",
-        "subaru",
-        "peugeot",
-        "smart",
-        "mini",
-        "hyundai",
-        "dacia",
-        "porsche",
-        "alfa_romeo",
-        "daewoo",
-        "saab",
-        "kia",
-        "chevrolet",
-        "volvo",
-        "skoda",
-        "seat",
-        "citroen",
-        "suzuki",
-        "honda",
-        "jeep",
-        "jaguar",
-        "daihatsu",
-        "land_rover",
-        "chrysler",
-        "rover",
-        "lada",
-    ];
+    const [brands, setBrands] = useState([]);
 
     useEffect(() => {
         const darkModePreference = localStorage.getItem("darkMode");
         if (darkModePreference) {
             setDarkMode(JSON.parse(darkModePreference));
         }
+        fetchBrands();
     }, []);
+
+    const fetchBrands = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/api/brands");
+            const data = await response.json();
+            setBrands(data);
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    };
 
     const toggleDarkMode = () => {
         const newDarkMode = !darkMode;
