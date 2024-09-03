@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useInput } from "./useInput";
 import {
     TextField,
     Button,
@@ -27,13 +26,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import Swal from "sweetalert2";
 
 const App = () => {
-    const year = useInput("");
+    const [year, setYear] = useState("");
     const [brand, setBrand] = useState("");
-    const model = useInput("");
+    const [model, setModel] = useState("");
     const [vehicle, setVehicle] = useState("");
     const [gearbox, setGearbox] = useState("");
-    const kilo = useInput("");
-    const power = useInput("");
+    const [kilo, setKilo] = useState("");
+    const [power, setPower] = useState("");
     const [fueltype, setFueltype] = useState("");
     const [notrepaireddamage, setNotrepaireddamage] = useState("");
     const [searchResults, setSearchResults] = useState([]);
@@ -55,37 +54,17 @@ const App = () => {
         }
     };
 
-    const handleGear = (event) => {
-        setGearbox(event.target.value);
-    };
-
-    const handleRepair = (event) => {
-        setNotrepaireddamage(event.target.value);
-    };
-
-    const handleFuel = (event) => {
-        setFueltype(event.target.value);
-    };
-
-    const handleVehicle = (event) => {
-        setVehicle(event.target.value);
-    };
-
-    const handleBrand = (event) => {
-        setBrand(event.target.value);
-    };
-
     const handleSearch = async () => {
         try {
             setLoading(true);
             const searchParams = {
-                yearofregistration: year.value,
+                yearofregistration: year,
                 brand,
-                model: model.value,
+                model,
                 vehicletype: vehicle,
                 gearbox,
-                kilometer: kilo.value,
-                powerps: power.value,
+                kilometer: kilo,
+                powerps: power,
                 fueltype,
                 notrepaireddamage,
             };
@@ -150,12 +129,19 @@ const App = () => {
             </Typography>
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6} md={4}>
-                    <TextField fullWidth label="Year" variant="outlined" type="text" {...year} />
+                    <TextField
+                        fullWidth
+                        label="Year"
+                        variant="outlined"
+                        type="text"
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                    />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Brand</InputLabel>
-                        <Select name="brand" value={brand} onChange={handleBrand} label="Brand">
+                        <Select name="brand" value={brand} onChange={(e) => setBrand(e.target.value)} label="Brand">
                             {brands.map((c) => (
                                 <MenuItem key={c} value={c}>
                                     {capitalize(c)}
@@ -165,12 +151,24 @@ const App = () => {
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <TextField fullWidth label="Model" variant="outlined" type="text" {...model} />
+                    <TextField
+                        fullWidth
+                        label="Model"
+                        variant="outlined"
+                        type="text"
+                        value={model}
+                        onChange={(e) => setModel(e.target.value)}
+                    />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Vehicle Type</InputLabel>
-                        <Select name="vehicle" value={vehicle} onChange={handleVehicle} label="Vehicle Type">
+                        <Select
+                            name="vehicle"
+                            value={vehicle}
+                            onChange={(e) => setVehicle(e.target.value)}
+                            label="Vehicle Type"
+                        >
                             <MenuItem value={"limousine"}>Sedan</MenuItem>
                             <MenuItem value={"coupe"}>Coupe</MenuItem>
                             <MenuItem value={"kleinwagen"}>Hatchback</MenuItem>
@@ -185,22 +183,46 @@ const App = () => {
                 <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Gearbox</InputLabel>
-                        <Select name="gearbox" value={gearbox} onChange={handleGear} label="Gearbox">
+                        <Select
+                            name="gearbox"
+                            value={gearbox}
+                            onChange={(e) => setGearbox(e.target.value)}
+                            label="Gearbox"
+                        >
                             <MenuItem value={"manuell"}>Manual</MenuItem>
                             <MenuItem value={"automatik"}>Automatic</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <TextField fullWidth label="Kilometers" variant="outlined" type="text" {...kilo} />
+                    <TextField
+                        fullWidth
+                        label="Kilometers"
+                        variant="outlined"
+                        type="text"
+                        value={kilo}
+                        onChange={(e) => setKilo(e.target.value)}
+                    />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <TextField fullWidth label="Horse Power" variant="outlined" type="text" {...power} />
+                    <TextField
+                        fullWidth
+                        label="Horse Power"
+                        variant="outlined"
+                        type="text"
+                        value={power}
+                        onChange={(e) => setPower(e.target.value)}
+                    />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Fuel Type</InputLabel>
-                        <Select name="fueltype" value={fueltype} onChange={handleFuel} label="Fuel Type">
+                        <Select
+                            name="fueltype"
+                            value={fueltype}
+                            onChange={(e) => setFueltype(e.target.value)}
+                            label="Fuel Type"
+                        >
                             <MenuItem value={"benzin"}>Gasoline</MenuItem>
                             <MenuItem value={"diesel"}>Diesel</MenuItem>
                             <MenuItem value={"hybrid"}>Hybrid</MenuItem>
@@ -217,7 +239,7 @@ const App = () => {
                         <Select
                             name="notrepaireddamage"
                             value={notrepaireddamage}
-                            onChange={handleRepair}
+                            onChange={(e) => setNotrepaireddamage(e.target.value)}
                             label="Damaged"
                         >
                             <MenuItem value={"nein"}>No</MenuItem>
