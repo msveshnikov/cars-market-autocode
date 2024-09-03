@@ -1,21 +1,25 @@
 # Cars Market (built by [AutoCode](https://autocode.work) in 20 minutes)
 
+![alt text](image-1.png)
+
+![alt text](image.png)
+
 ## Overview
 
 Cars Market is a web application for browsing and searching cars. It utilizes React for the frontend and a MongoDB + Express backend.
 
 ## Features
 
-- React v18 with Material-UI 5 for a modern, responsive UI
-- React Router v6 for seamless navigation
-- MongoDB backend with Express server
-- Auto-loading of CSV data on first run (autos.csv in server folder)
-- Advanced search capabilities with rich filtering options
-- High-quality car images from Google Images
-- ES6 imports and async/await for modern JavaScript practices
-- Docker support for easy deployment and scalability
-- Prometheus monitoring integration
-- Grafana dashboard for visualizing metrics
+-   React v18 with Material-UI 5 for a modern, responsive UI
+-   React Router v6 for seamless navigation
+-   MongoDB backend with Express server
+-   Auto-loading of CSV data on first run (autos.csv in server folder)
+-   Advanced search capabilities with rich filtering options
+-   High-quality car images from Google Images
+-   ES6 imports and async/await for modern JavaScript practices
+-   Docker support for easy deployment and scalability
+-   Prometheus monitoring integration
+-   Grafana dashboard for visualizing metrics
 
 ## Project Structure
 
@@ -58,16 +62,16 @@ cars-market/
 
 ## Upcoming Improvements
 
-- Remove dark theme switch for a more focused user interface
-- Add server/autos.csv to Docker image for automatic data loading on first run
-- Replace any Unsplash images with more relevant car images
-- Implement error handling and logging for better debugging and monitoring
-- Add unit and integration tests for improved code reliability
-- Optimize Docker configuration for production deployment
-- Implement CI/CD pipeline for automated testing and deployment
-- Add input validation and sanitization for improved security
-- Implement rate limiting to prevent API abuse
-- Add a sitemap and improve SEO optimization
+-   Remove dark theme switch for a more focused user interface
+-   Add server/autos.csv to Docker image for automatic data loading on first run
+-   Replace any Unsplash images with more relevant car images
+-   Implement error handling and logging for better debugging and monitoring
+-   Add unit and integration tests for improved code reliability
+-   Optimize Docker configuration for production deployment
+-   Implement CI/CD pipeline for automated testing and deployment
+-   Add input validation and sanitization for improved security
+-   Implement rate limiting to prevent API abuse
+-   Add a sitemap and improve SEO optimization
 
 ## Getting Started
 
