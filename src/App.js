@@ -22,6 +22,7 @@ import {
     ListItemIcon,
     ListItemText,
     Box,
+    Skeleton,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter as Router, Route, Routes, Link, useParams } from "react-router-dom";
@@ -45,6 +46,7 @@ const App = () => {
     const [darkMode, setDarkMode] = useState(false);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [brands, setBrands] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const darkModePreference = localStorage.getItem("darkMode");
@@ -99,6 +101,7 @@ const App = () => {
 
     const handleSearch = async () => {
         try {
+            setLoading(true);
             const searchParams = {
                 yearofregistration: year.value,
                 brand,
@@ -116,6 +119,8 @@ const App = () => {
             setSearchResults(data);
         } catch (error) {
             console.error("Error fetching search results:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -293,35 +298,56 @@ const App = () => {
                     </Button>
                 </Grid>
             </Grid>
-            {searchResults.length > 0 && (
+            {loading ? (
                 <Grid container spacing={2} style={{ marginTop: "20px" }}>
-                    {searchResults.map((result) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={result._id}>
-                            <Card component={Link} to={`/car/${result._id}`} style={{ textDecoration: "none" }}>
-                                <CardMedia
-                                    component="img"
-                                    height="120"
-                                    image={result.image || `https://source.unsplash.com/featured/?car,${result.brand}`}
-                                    alt={`${result.brand} ${result.model}`}
-                                />
+                    {[...Array(8)].map((_, index) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                            <Card>
+                                <Skeleton variant="rectangular" height={120} />
                                 <CardContent>
-                                    <Typography variant="subtitle1" component="div">
-                                        {capitalize(result.brand)} {result.model}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Price: {Math.round(result.price)} EUR
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Year: {result.yearofregistration}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Mileage: {result.kilometer} km
-                                    </Typography>
+                                    <Skeleton variant="text" width="60%" />
+                                    <Skeleton variant="text" width="40%" />
+                                    <Skeleton variant="text" width="40%" />
+                                    <Skeleton variant="text" width="40%" />
                                 </CardContent>
                             </Card>
                         </Grid>
                     ))}
                 </Grid>
+            ) : (
+                searchResults.length > 0 && (
+                    <Grid container spacing={2} style={{ marginTop: "20px" }}>
+                        {searchResults.map((result) => (
+                            <Grid item xs={12} sm={6} md={4} lg={3} key={result._id}>
+                                <Card component={Link} to={`/car/${result._id}`} style={{ textDecoration: "none" }}>
+                                    <CardMedia
+                                        component="img"
+                                        height="120"
+                                        image={
+                                            result.image ||
+                                            `https://source.unsplash.com/featured/?car,${result.brand}`
+                                        }
+                                        alt={`${result.brand} ${result.model}`}
+                                    />
+                                    <CardContent>
+                                        <Typography variant="subtitle1" component="div">
+                                            {capitalize(result.brand)} {result.model}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Price: {Math.round(result.price)} EUR
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Year: {result.yearofregistration}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Mileage: {result.kilometer} km
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                )
             )}
         </Container>
     );
@@ -329,6 +355,7 @@ const App = () => {
     const CarDetails = () => {
         const { id } = useParams();
         const [car, setCar] = useState(null);
+        const [loading, setLoading] = useState(true);
 
         useEffect(() => {
             const fetchCarDetails = async () => {
@@ -338,14 +365,39 @@ const App = () => {
                     setCar(data);
                 } catch (error) {
                     console.error("Error fetching car details:", error);
+                } finally {
+                    setLoading(false);
                 }
             };
 
             fetchCarDetails();
         }, [id]);
 
+        if (loading) {
+            return (
+                <Container>
+                    <Skeleton variant="text" height={60} width="40%" />
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                            <Skeleton variant="rectangular" height={300} />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Skeleton variant="text" height={30} width="60%" />
+                            <Skeleton variant="text" height={20} width="40%" />
+                            <Skeleton variant="text" height={20} width="40%" />
+                            <Skeleton variant="text" height={20} width="40%" />
+                            <Skeleton variant="text" height={20} width="40%" />
+                            <Skeleton variant="text" height={20} width="40%" />
+                            <Skeleton variant="text" height={20} width="40%" />
+                            <Skeleton variant="text" height={30} width="60%" style={{ marginTop: "1rem" }} />
+                        </Grid>
+                    </Grid>
+                </Container>
+            );
+        }
+
         if (!car) {
-            return <Typography>Loading...</Typography>;
+            return <Typography>Car not found</Typography>;
         }
 
         return (

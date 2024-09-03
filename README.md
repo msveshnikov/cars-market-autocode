@@ -42,3 +42,4 @@ cars-market/
 
 -   show skeleton car images
 -   fix dark thene to fully change all screen
+-   add server/autos.csv to docker image so it would load on first run
