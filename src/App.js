@@ -29,6 +29,7 @@ import { BrowserRouter as Router, Route, Routes, Link, useParams } from "react-r
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
+import Swal from "sweetalert2";
 
 const App = () => {
     const year = useInput("");
@@ -56,6 +57,7 @@ const App = () => {
             setBrands(data);
         } catch (error) {
             console.error("Error fetching brands:", error);
+            Swal.fire("Error", "Failed to fetch brands. Please try again later.", "error");
         }
     };
 
@@ -106,6 +108,7 @@ const App = () => {
             setSearchResults(data);
         } catch (error) {
             console.error("Error fetching search results:", error);
+            Swal.fire("Error", "Failed to fetch search results. Please try again later.", "error");
         } finally {
             setLoading(false);
         }
@@ -352,6 +355,7 @@ const App = () => {
                     setCar(data);
                 } catch (error) {
                     console.error("Error fetching car details:", error);
+                    Swal.fire("Error", "Failed to fetch car details. Please try again later.", "error");
                 } finally {
                     setLoading(false);
                 }
@@ -398,7 +402,10 @@ const App = () => {
                             <CardMedia
                                 component="img"
                                 height="300"
-                                image={car.image || `https://via.placeholder.com/300x200.png?text=${car.brand}+${car.model}`}
+                                image={
+                                    car.image ||
+                                    `https://via.placeholder.com/300x200.png?text=${car.brand}+${car.model}`
+                                }
                                 alt={`${car.brand} ${car.model}`}
                             />
                         </Card>
@@ -424,6 +431,15 @@ const App = () => {
     const theme = createTheme({
         palette: {
             mode: "light",
+            primary: {
+                main: "#1976D2",
+            },
+            secondary: {
+                main: "#FF4081",
+            },
+        },
+        typography: {
+            fontFamily: "'Roboto', sans-serif",
         },
     });
 

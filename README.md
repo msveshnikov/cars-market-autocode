@@ -62,9 +62,6 @@ cars-market/
 
 ## Upcoming Improvements
 
--   Remove dark theme switch for a more focused user interface
--   Add server/autos.csv to Docker image for automatic data loading on first run
--   Replace any Unsplash images with more relevant car images
 -   Implement error handling and logging for better debugging and monitoring
 -   Add unit and integration tests for improved code reliability
 -   Optimize Docker configuration for production deployment
@@ -87,3 +84,7 @@ Contributions are welcome! Please read our contributing guidelines and code of c
 ## License
 
 This project is licensed under the MIT License.
+
+# TODO
+
+-   improve design
