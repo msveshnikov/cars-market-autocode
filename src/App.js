@@ -29,8 +29,6 @@ import { BrowserRouter as Router, Route, Routes, Link, useParams } from "react-r
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 const App = () => {
     const year = useInput("");
@@ -43,16 +41,11 @@ const App = () => {
     const [fueltype, setFueltype] = useState("");
     const [notrepaireddamage, setNotrepaireddamage] = useState("");
     const [searchResults, setSearchResults] = useState([]);
-    const [darkMode, setDarkMode] = useState(false);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const darkModePreference = localStorage.getItem("darkMode");
-        if (darkModePreference) {
-            setDarkMode(JSON.parse(darkModePreference));
-        }
         fetchBrands();
     }, []);
 
@@ -64,12 +57,6 @@ const App = () => {
         } catch (error) {
             console.error("Error fetching brands:", error);
         }
-    };
-
-    const toggleDarkMode = () => {
-        const newDarkMode = !darkMode;
-        setDarkMode(newDarkMode);
-        localStorage.setItem("darkMode", JSON.stringify(newDarkMode));
     };
 
     const toggleDrawer = (open) => (event) => {
@@ -132,7 +119,7 @@ const App = () => {
         <Box>
             <Box
                 sx={{
-                    backgroundImage: "url('https://source.unsplash.com/random/1600x900/?luxury,car')",
+                    backgroundImage: "url('https://via.placeholder.com/1600x900.png?text=Cars+Market')",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     height: "600px",
@@ -325,7 +312,7 @@ const App = () => {
                                         height="120"
                                         image={
                                             result.image ||
-                                            `https://source.unsplash.com/featured/?car,${result.brand}`
+                                            `https://via.placeholder.com/300x200.png?text=${result.brand}+${result.model}`
                                         }
                                         alt={`${result.brand} ${result.model}`}
                                     />
@@ -411,7 +398,7 @@ const App = () => {
                             <CardMedia
                                 component="img"
                                 height="300"
-                                image={car.image || `https://source.unsplash.com/featured/?car,${car.brand}`}
+                                image={car.image || `https://via.placeholder.com/300x200.png?text=${car.brand}+${car.model}`}
                                 alt={`${car.brand} ${car.model}`}
                             />
                         </Card>
@@ -436,7 +423,7 @@ const App = () => {
 
     const theme = createTheme({
         palette: {
-            mode: darkMode ? "dark" : "light",
+            mode: "light",
         },
     });
 
@@ -471,9 +458,6 @@ const App = () => {
                             <Typography variant="h6" style={{ flexGrow: 1 }}>
                                 Cars Market
                             </Typography>
-                            <IconButton color="inherit" onClick={toggleDarkMode}>
-                                {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-                            </IconButton>
                         </Toolbar>
                     </AppBar>
                     <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>

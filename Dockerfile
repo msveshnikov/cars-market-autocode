@@ -16,8 +16,9 @@ WORKDIR /app
 COPY --from=build /app/package*.json ./
 RUN npm ci --only=production
 
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/build ./build
+COPY --from=build /app/server ./server
 
-EXPOSE 3000
+EXPOSE 3000 5000
 
 CMD ["npm", "start"]

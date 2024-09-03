@@ -20,6 +20,8 @@ services:
             - MONGO_URI=mongodb://mongo:27017/cars_market
         depends_on:
             - mongo
+        volumes:
+            - ./server/autos.csv:/app/autos.csv
 
     mongo:
         image: mongo:latest
