@@ -9,6 +9,8 @@ import { fileURLToPath } from "url";
 import compression from "compression";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { JSDOM } from "jsdom";
+import prometheus from "prom-client";
 
 dotenv.config();
 
@@ -44,9 +46,30 @@ const carSchema = new mongoose.Schema({
     fueltype: String,
     notrepaireddamage: String,
     price: Number,
+    image: String,
 });
 
 const Car = mongoose.model("Car", carSchema);
+
+const collectDefaultMetrics = prometheus.collectDefaultMetrics;
+collectDefaultMetrics();
+
+const httpRequestDurationMicroseconds = new prometheus.Histogram({
+    name: "http_request_duration_ms",
+    help: "Duration of HTTP requests in ms",
+    labelNames: ["method", "route", "code"],
+    buckets: [0.1, 5, 15, 50, 100, 200, 300, 400, 500],
+});
+
+app.use((req, res, next) => {
+    res.locals.startEpoch = Date.now();
+    next();
+});
+
+app.get("/metrics", async (req, res) => {
+    res.set("Content-Type", prometheus.register.contentType);
+    res.end(await prometheus.register.metrics());
+});
 
 app.get("/api/cars", async (req, res) => {
     try {
@@ -55,6 +78,9 @@ app.get("/api/cars", async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+    httpRequestDurationMicroseconds
+        .labels(req.method, req.route.path, res.statusCode)
+        .observe(Date.now() - res.locals.startEpoch);
 });
 
 app.get("/api/search", async (req, res) => {
@@ -74,6 +100,9 @@ app.get("/api/search", async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+    httpRequestDurationMicroseconds
+        .labels(req.method, req.route.path, res.statusCode)
+        .observe(Date.now() - res.locals.startEpoch);
 });
 
 app.get("/api/cars/:id", async (req, res) => {
@@ -82,10 +111,17 @@ app.get("/api/cars/:id", async (req, res) => {
         if (!car) {
             return res.status(404).json({ message: "Car not found" });
         }
+        if (!car.image) {
+            car.image = await getCarImage(car.brand, car.model);
+            await car.save();
+        }
         res.json(car);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+    httpRequestDurationMicroseconds
+        .labels(req.method, req.route.path, res.statusCode)
+        .observe(Date.now() - res.locals.startEpoch);
 });
 
 app.get("/api/brands", async (req, res) => {
@@ -95,6 +131,9 @@ app.get("/api/brands", async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+    httpRequestDurationMicroseconds
+        .labels(req.method, req.route.path, res.statusCode)
+        .observe(Date.now() - res.locals.startEpoch);
 });
 
 app.get("/api/models", async (req, res) => {
@@ -105,7 +144,25 @@ app.get("/api/models", async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+    httpRequestDurationMicroseconds
+        .labels(req.method, req.route.path, res.statusCode)
+        .observe(Date.now() - res.locals.startEpoch);
 });
+
+const getCarImage = async (brand, model) => {
+    try {
+        const query = encodeURIComponent(`${brand} ${model} car`);
+        const response = await fetch(`https://www.google.com/search?q=${query}&tbm=isch`);
+        const html = await response.text();
+        const dom = new JSDOM(html);
+        const imgElements = dom.window.document.querySelectorAll("img");
+        const imgSrc = imgElements[1]?.src;
+        return imgSrc || "";
+    } catch (error) {
+        console.error("Error fetching car image:", error);
+        return "";
+    }
+};
 
 const loadCSVData = async () => {
     const results = [];

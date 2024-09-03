@@ -13,6 +13,9 @@ Cars Market is a web application for browsing and searching cars. It utilizes Re
 -   Advanced search capabilities with rich filtering options
 -   High-quality car images from Google Images
 -   Use only ES6 imports and async/await, no axios
+-   Docker support for easy deployment and scalability
+-   Prometheus monitoring integration
+-   Grafana dashboard for visualizing metrics
 
 ## Project Structure
 
@@ -35,7 +38,6 @@ cars-market/
     └── package.json
 ```
 
-## TODO
+# TODO
 
--   Remove unsplash and implelent car pictures via API from (Google search scraping)
--   Implement user authentication and authorization system
+-   load image in /car endpoint, not in csv parse

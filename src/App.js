@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useInput } from "./useInput";
 import {
     TextField,
@@ -30,6 +30,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import debounce from "lodash/debounce";
 
 const App = () => {
     const year = useInput("");
@@ -97,18 +98,45 @@ const App = () => {
         setBrand(event.target.value);
     };
 
-    const searchHandler = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch(
-                `http://localhost:5000/api/search?yearofregistration=${year.value}&brand=${brand}&model=${model.value}&vehicletype=${vehicle}&gearbox=${gearbox}&kilometer=${kilo.value}&powerps=${power.value}&fueltype=${fueltype}&notrepaireddamage=${notrepaireddamage}`
-            );
-            const data = await response.json();
-            setSearchResults(data);
-        } catch (error) {
-            console.error("Error fetching search results:", error);
-        }
-    };
+    const debouncedSearch = useCallback(
+        debounce(async (searchParams) => {
+            try {
+                const queryString = new URLSearchParams(searchParams).toString();
+                const response = await fetch(`http://localhost:5000/api/search?${queryString}`);
+                const data = await response.json();
+                setSearchResults(data);
+            } catch (error) {
+                console.error("Error fetching search results:", error);
+            }
+        }, 3000),
+        []
+    );
+
+    useEffect(() => {
+        const searchParams = {
+            yearofregistration: year.value,
+            brand,
+            model: model.value,
+            vehicletype: vehicle,
+            gearbox,
+            kilometer: kilo.value,
+            powerps: power.value,
+            fueltype,
+            notrepaireddamage,
+        };
+        debouncedSearch(searchParams);
+    }, [
+        year.value,
+        brand,
+        model.value,
+        vehicle,
+        gearbox,
+        kilo.value,
+        power.value,
+        fueltype,
+        notrepaireddamage,
+        debouncedSearch,
+    ]);
 
     function capitalize(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -201,100 +229,93 @@ const App = () => {
             <Typography variant="h4" gutterBottom>
                 Search Cars
             </Typography>
-            <form onSubmit={searchHandler} className="search">
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                        <TextField fullWidth label="Year" variant="outlined" type="text" {...year} />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth variant="outlined">
-                            <InputLabel>Brand</InputLabel>
-                            <Select name="brand" value={brand} onChange={handleBrand} label="Brand">
-                                {brands.map((c) => (
-                                    <MenuItem key={c} value={c}>
-                                        {capitalize(c)}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField fullWidth label="Model" variant="outlined" type="text" {...model} />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth variant="outlined">
-                            <InputLabel>Vehicle Type</InputLabel>
-                            <Select name="vehicle" value={vehicle} onChange={handleVehicle} label="Vehicle Type">
-                                <MenuItem value={"limousine"}>Sedan</MenuItem>
-                                <MenuItem value={"coupe"}>Coupe</MenuItem>
-                                <MenuItem value={"kleinwagen"}>Hatchback</MenuItem>
-                                <MenuItem value={"suv"}>SUV</MenuItem>
-                                <MenuItem value={"kombi"}>Combi</MenuItem>
-                                <MenuItem value={"cabrio"}>Cabriolet</MenuItem>
-                                <MenuItem value={"bus"}>Bus</MenuItem>
-                                <MenuItem value={"andere"}>Other</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth variant="outlined">
-                            <InputLabel>Gearbox</InputLabel>
-                            <Select name="gearbox" value={gearbox} onChange={handleGear} label="Gearbox">
-                                <MenuItem value={"manuell"}>Manual</MenuItem>
-                                <MenuItem value={"automatik"}>Automatic</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField fullWidth label="Kilometers" variant="outlined" type="text" {...kilo} />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField fullWidth label="Horse Power" variant="outlined" type="text" {...power} />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth variant="outlined">
-                            <InputLabel>Fuel Type</InputLabel>
-                            <Select name="fueltype" value={fueltype} onChange={handleFuel} label="Fuel Type">
-                                <MenuItem value={"benzin"}>Gasoline</MenuItem>
-                                <MenuItem value={"diesel"}>Diesel</MenuItem>
-                                <MenuItem value={"hybrid"}>Hybrid</MenuItem>
-                                <MenuItem value={"lpg"}>LPG</MenuItem>
-                                <MenuItem value={"cng"}>CNG</MenuItem>
-                                <MenuItem value={"elektro"}>Electro</MenuItem>
-                                <MenuItem value={"andere"}>Other</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth variant="outlined">
-                            <InputLabel>Damaged</InputLabel>
-                            <Select
-                                name="notrepaireddamage"
-                                value={notrepaireddamage}
-                                onChange={handleRepair}
-                                label="Damaged"
-                            >
-                                <MenuItem value={"nein"}>No</MenuItem>
-                                <MenuItem value={"ja"}>Yes</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button type="submit" variant="contained" color="primary" fullWidth>
-                            Search
-                        </Button>
-                    </Grid>
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                    <TextField fullWidth label="Year" variant="outlined" type="text" {...year} />
                 </Grid>
-            </form>
+                <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Brand</InputLabel>
+                        <Select name="brand" value={brand} onChange={handleBrand} label="Brand">
+                            {brands.map((c) => (
+                                <MenuItem key={c} value={c}>
+                                    {capitalize(c)}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField fullWidth label="Model" variant="outlined" type="text" {...model} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Vehicle Type</InputLabel>
+                        <Select name="vehicle" value={vehicle} onChange={handleVehicle} label="Vehicle Type">
+                            <MenuItem value={"limousine"}>Sedan</MenuItem>
+                            <MenuItem value={"coupe"}>Coupe</MenuItem>
+                            <MenuItem value={"kleinwagen"}>Hatchback</MenuItem>
+                            <MenuItem value={"suv"}>SUV</MenuItem>
+                            <MenuItem value={"kombi"}>Combi</MenuItem>
+                            <MenuItem value={"cabrio"}>Cabriolet</MenuItem>
+                            <MenuItem value={"bus"}>Bus</MenuItem>
+                            <MenuItem value={"andere"}>Other</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Gearbox</InputLabel>
+                        <Select name="gearbox" value={gearbox} onChange={handleGear} label="Gearbox">
+                            <MenuItem value={"manuell"}>Manual</MenuItem>
+                            <MenuItem value={"automatik"}>Automatic</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField fullWidth label="Kilometers" variant="outlined" type="text" {...kilo} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField fullWidth label="Horse Power" variant="outlined" type="text" {...power} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Fuel Type</InputLabel>
+                        <Select name="fueltype" value={fueltype} onChange={handleFuel} label="Fuel Type">
+                            <MenuItem value={"benzin"}>Gasoline</MenuItem>
+                            <MenuItem value={"diesel"}>Diesel</MenuItem>
+                            <MenuItem value={"hybrid"}>Hybrid</MenuItem>
+                            <MenuItem value={"lpg"}>LPG</MenuItem>
+                            <MenuItem value={"cng"}>CNG</MenuItem>
+                            <MenuItem value={"elektro"}>Electro</MenuItem>
+                            <MenuItem value={"andere"}>Other</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Damaged</InputLabel>
+                        <Select
+                            name="notrepaireddamage"
+                            value={notrepaireddamage}
+                            onChange={handleRepair}
+                            label="Damaged"
+                        >
+                            <MenuItem value={"nein"}>No</MenuItem>
+                            <MenuItem value={"ja"}>Yes</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+            </Grid>
             {searchResults.length > 0 && (
                 <Grid container spacing={2} style={{ marginTop: "20px" }}>
-                    {searchResults.map((result, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
+                    {searchResults.map((result) => (
+                        <Grid item xs={12} sm={6} md={4} key={result._id}>
                             <Card component={Link} to={`/car/${result._id}`} style={{ textDecoration: "none" }}>
                                 <CardMedia
                                     component="img"
                                     height="140"
-                                    image={`https://source.unsplash.com/featured/?car,${result.brand}`}
+                                    image={result.image || `https://source.unsplash.com/featured/?car,${result.brand}`}
                                     alt={`${result.brand} ${result.model}`}
                                 />
                                 <CardContent>
@@ -352,7 +373,7 @@ const App = () => {
                             <CardMedia
                                 component="img"
                                 height="300"
-                                image={`https://source.unsplash.com/featured/?car,${car.brand}`}
+                                image={car.image || `https://source.unsplash.com/featured/?car,${car.brand}`}
                                 alt={`${car.brand} ${car.model}`}
                             />
                         </Card>
