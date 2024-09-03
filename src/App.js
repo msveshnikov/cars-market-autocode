@@ -17,11 +17,14 @@ import {
     IconButton,
     Box,
     Skeleton,
+    Pagination,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter as Router, Route, Routes, Link, useParams } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import Swal from "sweetalert2";
 
 const App = () => {
@@ -37,9 +40,17 @@ const App = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [favorites, setFavorites] = useState([]);
+    const [compareList, setCompareList] = useState([]);
 
     useEffect(() => {
         fetchBrands();
+        const storedFavorites = localStorage.getItem("favorites");
+        if (storedFavorites) {
+            setFavorites(JSON.parse(storedFavorites));
+        }
     }, []);
 
     const fetchBrands = async () => {
@@ -53,7 +64,7 @@ const App = () => {
         }
     };
 
-    const handleSearch = async () => {
+    const handleSearch = async (pageNumber = 1) => {
         try {
             setLoading(true);
             const searchParams = {
@@ -66,16 +77,41 @@ const App = () => {
                 powerps: power,
                 fueltype,
                 notrepaireddamage,
+                page: pageNumber,
             };
             const queryString = new URLSearchParams(searchParams).toString();
             const response = await fetch(`http://localhost:5000/api/search?${queryString}`);
             const data = await response.json();
-            setSearchResults(data);
+            setSearchResults(data.cars);
+            setTotalPages(data.totalPages);
+            setPage(pageNumber);
         } catch (error) {
             console.error("Error fetching search results:", error);
             Swal.fire("Error", "Failed to fetch search results. Please try again later.", "error");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handlePageChange = (event, value) => {
+        handleSearch(value);
+    };
+
+    const toggleFavorite = (car) => {
+        const newFavorites = favorites.some((fav) => fav._id === car._id)
+            ? favorites.filter((fav) => fav._id !== car._id)
+            : [...favorites, car];
+        setFavorites(newFavorites);
+        localStorage.setItem("favorites", JSON.stringify(newFavorites));
+    };
+
+    const toggleCompare = (car) => {
+        if (compareList.some((item) => item._id === car._id)) {
+            setCompareList(compareList.filter((item) => item._id !== car._id));
+        } else if (compareList.length < 3) {
+            setCompareList([...compareList, car]);
+        } else {
+            Swal.fire("Error", "You can compare up to 3 cars at a time.", "error");
         }
     };
 
@@ -247,7 +283,7 @@ const App = () => {
                     </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                    <Button variant="contained" color="primary" onClick={handleSearch} size="large">
+                    <Button variant="contained" color="primary" onClick={() => handleSearch(1)} size="large">
                         Search
                     </Button>
                 </Grid>
@@ -269,38 +305,73 @@ const App = () => {
                     ))}
                 </Grid>
             ) : (
-                searchResults.length > 0 && (
-                    <Grid container spacing={3} sx={{ mt: 4 }}>
-                        {searchResults.map((result) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={result._id}>
-                                <Card component={Link} to={`/car/${result._id}`} sx={{ textDecoration: "none" }}>
-                                    <CardMedia
-                                        component="img"
-                                        height="160"
-                                        image={
-                                            result.image ||
-                                            `https://via.placeholder.com/300x200.png?text=${result.brand}+${result.model}`
-                                        }
-                                        alt={`${result.brand} ${result.model}`}
-                                    />
-                                    <CardContent>
-                                        <Typography variant="h6" component="div">
-                                            {capitalize(result.brand)} {result.model}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Price: {Math.round(result.price)} EUR
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Year: {result.yearofregistration}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Mileage: {result.kilometer} km
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
+                searchResults?.length > 0 && (
+                    <>
+                        <Grid container spacing={3} sx={{ mt: 4 }}>
+                            {searchResults.map((result) => (
+                                <Grid item xs={12} sm={6} md={4} lg={3} key={result._id}>
+                                    <Card>
+                                        <CardMedia
+                                            component="img"
+                                            height="160"
+                                            image={
+                                                result.image ||
+                                                `https://via.placeholder.com/300x200.png?text=${result.brand}+${result.model}`
+                                            }
+                                            alt={`${result.brand} ${result.model}`}
+                                        />
+                                        <CardContent>
+                                            <Typography variant="h6" component="div">
+                                                {capitalize(result.brand)} {result.model}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Price: {Math.round(result.price)} EUR
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Year: {result.yearofregistration}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Mileage: {result.kilometer} km
+                                            </Typography>
+                                            <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    component={Link}
+                                                    to={`/car/${result._id}`}
+                                                >
+                                                    View Details
+                                                </Button>
+                                                <IconButton
+                                                    onClick={() => toggleFavorite(result)}
+                                                    color={
+                                                        favorites.some((fav) => fav._id === result._id)
+                                                            ? "secondary"
+                                                            : "default"
+                                                    }
+                                                >
+                                                    <FavoriteIcon />
+                                                </IconButton>
+                                                <IconButton
+                                                    onClick={() => toggleCompare(result)}
+                                                    color={
+                                                        compareList.some((item) => item._id === result._id)
+                                                            ? "primary"
+                                                            : "default"
+                                                    }
+                                                >
+                                                    <CompareArrowsIcon />
+                                                </IconButton>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                            <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
+                        </Box>
+                    </>
                 )
             )}
         </Container>
@@ -386,11 +457,129 @@ const App = () => {
                         <Typography variant="h6" sx={{ mt: 2 }}>
                             Price: {Math.round(car.price)} EUR
                         </Typography>
+                        <Box sx={{ mt: 2 }}>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={() => toggleFavorite(car)}
+                                startIcon={<FavoriteIcon />}
+                                sx={{ mr: 2 }}
+                            >
+                                {favorites.some((fav) => fav._id === car._id)
+                                    ? "Remove from Favorites"
+                                    : "Add to Favorites"}
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => toggleCompare(car)}
+                                startIcon={<CompareArrowsIcon />}
+                            >
+                                {compareList.some((item) => item._id === car._id)
+                                    ? "Remove from Compare"
+                                    : "Add to Compare"}
+                            </Button>
+                        </Box>
                     </Grid>
                 </Grid>
             </Container>
         );
     };
+
+    const Favorites = () => (
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            <Typography variant="h4" gutterBottom>
+                Favorite Cars
+            </Typography>
+            <Grid container spacing={3}>
+                {favorites.map((car) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={car._id}>
+                        <Card>
+                            <CardMedia
+                                component="img"
+                                height="160"
+                                image={
+                                    car.image ||
+                                    `https://via.placeholder.com/300x200.png?text=${car.brand}+${car.model}`
+                                }
+                                alt={`${car.brand} ${car.model}`}
+                            />
+                            <CardContent>
+                                <Typography variant="h6" component="div">
+                                    {capitalize(car.brand)} {car.model}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Price: {Math.round(car.price)} EUR
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Year: {car.yearofregistration}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Mileage: {car.kilometer} km
+                                </Typography>
+                                <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+                                    <Button variant="outlined" size="small" component={Link} to={`/car/${car._id}`}>
+                                        View Details
+                                    </Button>
+                                    <IconButton onClick={() => toggleFavorite(car)} color="secondary">
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
+    );
+
+    const Compare = () => (
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            <Typography variant="h4" gutterBottom>
+                Compare Cars
+            </Typography>
+            <Grid container spacing={3}>
+                {compareList.map((car) => (
+                    <Grid item xs={12} sm={6} md={4} key={car._id}>
+                        <Card>
+                            <CardMedia
+                                component="img"
+                                height="160"
+                                image={
+                                    car.image ||
+                                    `https://via.placeholder.com/300x200.png?text=${car.brand}+${car.model}`
+                                }
+                                alt={`${car.brand} ${car.model}`}
+                            />
+                            <CardContent>
+                                <Typography variant="h6" component="div">
+                                    {capitalize(car.brand)} {car.model}
+                                </Typography>
+                                <Typography>Year: {car.yearofregistration}</Typography>
+                                <Typography>Vehicle Type: {capitalize(car.vehicletype)}</Typography>
+                                <Typography>Gearbox: {capitalize(car.gearbox)}</Typography>
+                                <Typography>Mileage: {car.kilometer} km</Typography>
+                                <Typography>Power: {car.powerps} PS</Typography>
+                                <Typography>Fuel Type: {capitalize(car.fueltype)}</Typography>
+                                <Typography>Damaged: {car.notrepaireddamage === "nein" ? "No" : "Yes"}</Typography>
+                                <Typography variant="h6" sx={{ mt: 2 }}>
+                                    Price: {Math.round(car.price)} EUR
+                                </Typography>
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    onClick={() => toggleCompare(car)}
+                                    sx={{ mt: 2 }}
+                                >
+                                    Remove from Compare
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
+    );
 
     const theme = createTheme({
         palette: {
@@ -431,12 +620,22 @@ const App = () => {
                                 <SearchIcon sx={{ mr: 1 }} />
                                 Search
                             </Button>
+                            <Button color="inherit" component={Link} to="/favorites">
+                                <FavoriteIcon sx={{ mr: 1 }} />
+                                Favorites
+                            </Button>
+                            <Button color="inherit" component={Link} to="/compare">
+                                <CompareArrowsIcon sx={{ mr: 1 }} />
+                                Compare
+                            </Button>
                         </Toolbar>
                     </AppBar>
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/search" element={<Search />} />
                         <Route path="/car/:id" element={<CarDetails />} />
+                        <Route path="/favorites" element={<Favorites />} />
+                        <Route path="/compare" element={<Compare />} />
                     </Routes>
                 </Box>
             </Router>
