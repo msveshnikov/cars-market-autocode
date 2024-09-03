@@ -16,11 +16,6 @@ import {
     AppBar,
     Toolbar,
     IconButton,
-    Drawer,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
     Box,
     Skeleton,
 } from "@mui/material";
@@ -42,7 +37,6 @@ const App = () => {
     const [fueltype, setFueltype] = useState("");
     const [notrepaireddamage, setNotrepaireddamage] = useState("");
     const [searchResults, setSearchResults] = useState([]);
-    const [drawerOpen, setDrawerOpen] = useState(false);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -59,13 +53,6 @@ const App = () => {
             console.error("Error fetching brands:", error);
             Swal.fire("Error", "Failed to fetch brands. Please try again later.", "error");
         }
-    };
-
-    const toggleDrawer = (open) => (event) => {
-        if (event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
-            return;
-        }
-        setDrawerOpen(open);
     };
 
     const handleGear = (event) => {
@@ -126,13 +113,12 @@ const App = () => {
                         "url('https://plus.unsplash.com/premium_photo-1664303847960-586318f59035?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    height: "600px",
+                    height: "100vh",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     textAlign: "center",
                     color: "white",
-                    marginBottom: "2rem",
                 }}
             >
                 <Box sx={{ backgroundColor: "rgba(0, 0, 0, 0.6)", padding: "40px", borderRadius: "10px" }}>
@@ -154,63 +140,19 @@ const App = () => {
                     </Button>
                 </Box>
             </Box>
-            <Container>
-                <Typography variant="h4" gutterBottom>
-                    Key Features
-                </Typography>
-                <Grid container spacing={4}>
-                    <Grid item xs={12} md={4}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h6" gutterBottom>
-                                    Modern UI
-                                </Typography>
-                                <Typography>
-                                    Enjoy a seamless experience with our React v18 and Material-UI 5 powered interface
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h6" gutterBottom>
-                                    Advanced Search
-                                </Typography>
-                                <Typography>
-                                    Find your perfect car using our rich filtering options and powerful search
-                                    capabilities
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h6" gutterBottom>
-                                    High-Quality Images
-                                </Typography>
-                                <Typography>
-                                    View detailed, high-resolution car images sourced from Google Images
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                </Grid>
-            </Container>
         </Box>
     );
 
     const Search = () => (
-        <Container>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Typography variant="h4" gutterBottom>
                 Search Cars
             </Typography>
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+            <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} md={4}>
                     <TextField fullWidth label="Year" variant="outlined" type="text" {...year} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Brand</InputLabel>
                         <Select name="brand" value={brand} onChange={handleBrand} label="Brand">
@@ -222,10 +164,10 @@ const App = () => {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} md={4}>
                     <TextField fullWidth label="Model" variant="outlined" type="text" {...model} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Vehicle Type</InputLabel>
                         <Select name="vehicle" value={vehicle} onChange={handleVehicle} label="Vehicle Type">
@@ -240,7 +182,7 @@ const App = () => {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Gearbox</InputLabel>
                         <Select name="gearbox" value={gearbox} onChange={handleGear} label="Gearbox">
@@ -249,13 +191,13 @@ const App = () => {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} md={4}>
                     <TextField fullWidth label="Kilometers" variant="outlined" type="text" {...kilo} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} md={4}>
                     <TextField fullWidth label="Horse Power" variant="outlined" type="text" {...power} />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Fuel Type</InputLabel>
                         <Select name="fueltype" value={fueltype} onChange={handleFuel} label="Fuel Type">
@@ -269,7 +211,7 @@ const App = () => {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} md={4}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel>Damaged</InputLabel>
                         <Select
@@ -284,17 +226,17 @@ const App = () => {
                     </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                    <Button variant="contained" color="primary" onClick={handleSearch}>
+                    <Button variant="contained" color="primary" onClick={handleSearch} size="large">
                         Search
                     </Button>
                 </Grid>
             </Grid>
             {loading ? (
-                <Grid container spacing={2} style={{ marginTop: "20px" }}>
+                <Grid container spacing={3} sx={{ mt: 4 }}>
                     {[...Array(8)].map((_, index) => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                             <Card>
-                                <Skeleton variant="rectangular" height={120} />
+                                <Skeleton variant="rectangular" height={160} />
                                 <CardContent>
                                     <Skeleton variant="text" width="60%" />
                                     <Skeleton variant="text" width="40%" />
@@ -307,13 +249,13 @@ const App = () => {
                 </Grid>
             ) : (
                 searchResults.length > 0 && (
-                    <Grid container spacing={2} style={{ marginTop: "20px" }}>
+                    <Grid container spacing={3} sx={{ mt: 4 }}>
                         {searchResults.map((result) => (
                             <Grid item xs={12} sm={6} md={4} lg={3} key={result._id}>
-                                <Card component={Link} to={`/car/${result._id}`} style={{ textDecoration: "none" }}>
+                                <Card component={Link} to={`/car/${result._id}`} sx={{ textDecoration: "none" }}>
                                     <CardMedia
                                         component="img"
-                                        height="120"
+                                        height="160"
                                         image={
                                             result.image ||
                                             `https://via.placeholder.com/300x200.png?text=${result.brand}+${result.model}`
@@ -321,7 +263,7 @@ const App = () => {
                                         alt={`${result.brand} ${result.model}`}
                                     />
                                     <CardContent>
-                                        <Typography variant="subtitle1" component="div">
+                                        <Typography variant="h6" component="div">
                                             {capitalize(result.brand)} {result.model}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
@@ -367,11 +309,11 @@ const App = () => {
 
         if (loading) {
             return (
-                <Container>
+                <Container maxWidth="lg" sx={{ mt: 4 }}>
                     <Skeleton variant="text" height={60} width="40%" />
-                    <Grid container spacing={2}>
+                    <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
-                            <Skeleton variant="rectangular" height={300} />
+                            <Skeleton variant="rectangular" height={400} />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Skeleton variant="text" height={30} width="60%" />
@@ -381,7 +323,7 @@ const App = () => {
                             <Skeleton variant="text" height={20} width="40%" />
                             <Skeleton variant="text" height={20} width="40%" />
                             <Skeleton variant="text" height={20} width="40%" />
-                            <Skeleton variant="text" height={30} width="60%" style={{ marginTop: "1rem" }} />
+                            <Skeleton variant="text" height={30} width="60%" sx={{ mt: 2 }} />
                         </Grid>
                     </Grid>
                 </Container>
@@ -393,16 +335,16 @@ const App = () => {
         }
 
         return (
-            <Container>
+            <Container maxWidth="lg" sx={{ mt: 4 }}>
                 <Typography variant="h4" gutterBottom>
                     {capitalize(car.brand)} {car.model}
                 </Typography>
-                <Grid container spacing={2}>
+                <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
                         <Card>
                             <CardMedia
                                 component="img"
-                                height="300"
+                                height="400"
                                 image={
                                     car.image ||
                                     `https://via.placeholder.com/300x200.png?text=${car.brand}+${car.model}`
@@ -420,7 +362,7 @@ const App = () => {
                         <Typography>Power: {car.powerps} PS</Typography>
                         <Typography>Fuel Type: {capitalize(car.fueltype)}</Typography>
                         <Typography>Damaged: {car.notrepaireddamage === "nein" ? "No" : "Yes"}</Typography>
-                        <Typography variant="h6" style={{ marginTop: "1rem" }}>
+                        <Typography variant="h6" sx={{ mt: 2 }}>
                             Price: {Math.round(car.price)} EUR
                         </Typography>
                     </Grid>
@@ -444,50 +386,38 @@ const App = () => {
         },
     });
 
-    const drawerContent = (
-        <div role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
-            <List>
-                <ListItem button component={Link} to="/">
-                    <ListItemIcon>
-                        <HomeIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Home" />
-                </ListItem>
-                <ListItem button component={Link} to="/search">
-                    <ListItemIcon>
-                        <SearchIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Search" />
-                </ListItem>
-            </List>
-        </div>
-    );
-
     return (
         <ThemeProvider theme={theme}>
             <Router>
-                <div className="App">
+                <Box sx={{ flexGrow: 1 }}>
                     <AppBar position="static">
                         <Toolbar>
-                            <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
-                                <MenuIcon />
+                            <IconButton
+                                size="large"
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                                sx={{ mr: 2 }}
+                                component={Link}
+                                to="/"
+                            >
+                                <HomeIcon />
                             </IconButton>
-                            <Typography variant="h6" style={{ flexGrow: 1 }}>
+                            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                                 Cars Market
                             </Typography>
+                            <Button color="inherit" component={Link} to="/search">
+                                <SearchIcon sx={{ mr: 1 }} />
+                                Search
+                            </Button>
                         </Toolbar>
                     </AppBar>
-                    <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-                        {drawerContent}
-                    </Drawer>
-                    <Box sx={{ marginTop: "2rem" }}>
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/search" element={<Search />} />
-                            <Route path="/car/:id" element={<CarDetails />} />
-                        </Routes>
-                    </Box>
-                </div>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/search" element={<Search />} />
+                        <Route path="/car/:id" element={<CarDetails />} />
+                    </Routes>
+                </Box>
             </Router>
         </ThemeProvider>
     );
