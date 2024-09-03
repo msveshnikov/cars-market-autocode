@@ -1,17 +1,23 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const csv = require("csv-parser");
-const fs = require("fs");
-const path = require("path");
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import csv from "csv-parser";
+import fs from "fs";
+import path from "path";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb://localhost/cars_market", {
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/cars_market", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
@@ -42,7 +48,13 @@ app.get("/api/cars", async (req, res) => {
 
 app.get("/api/search", async (req, res) => {
     try {
-        const cars = await Car.find(req.query);
+        const query = {};
+        for (const key in req.query) {
+            if (req.query[key]) {
+                query[key] = req.query[key];
+            }
+        }
+        const cars = await Car.find(query);
         res.json(cars);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -51,26 +63,34 @@ app.get("/api/search", async (req, res) => {
 
 const loadCSVData = async () => {
     const results = [];
-    fs.createReadStream(path.join(__dirname, "autos.csv"))
-        .pipe(csv())
-        .on("data", (data) => results.push(data))
-        .on("end", async () => {
-            try {
-                await Car.insertMany(results);
-                console.log("CSV data loaded successfully");
-            } catch (error) {
-                console.error("Error loading CSV data:", error);
-            }
-        });
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(path.join(__dirname, "autos.csv"))
+            .pipe(csv())
+            .on("data", (data) => results.push(data))
+            .on("end", async () => {
+                try {
+                    await Car.insertMany(results);
+                    console.log("CSV data loaded successfully");
+                    resolve();
+                } catch (error) {
+                    console.error("Error loading CSV data:", error);
+                    reject(error);
+                }
+            });
+    });
 };
 
 const initializeDatabase = async () => {
-    const count = await Car.countDocuments();
-    if (count === 0) {
-        console.log("Database is empty. Loading CSV data...");
-        await loadCSVData();
-    } else {
-        console.log("Database already contains data");
+    try {
+        const count = await Car.countDocuments();
+        if (count === 0) {
+            console.log("Database is empty. Loading CSV data...");
+            await loadCSVData();
+        } else {
+            console.log("Database already contains data");
+        }
+    } catch (error) {
+        console.error("Error initializing database:", error);
     }
 };
 
@@ -78,3 +98,5 @@ app.listen(port, async () => {
     console.log(`Server is running on port ${port}`);
     await initializeDatabase();
 });
+
+export default app;

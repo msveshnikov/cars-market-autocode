@@ -13,30 +13,19 @@ import {
     Card,
     CardContent,
     CardMedia,
-} from "@material-ui/core";
-import { createTheme, ThemeProvider } from "@material-ui/core/styles";
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+} from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import logo from "./assets/orange-car-hp-right-mercedez.png";
 
-const theme = createTheme({
-    palette: {
-        primary: {
-            main: "#1976d2",
-        },
-        secondary: {
-            main: "#dc004e",
-        },
-    },
-});
-
 const App = () => {
-    const [year] = useInput("");
+    const year = useInput("");
     const [brand, setBrand] = useState("ford");
-    const [model] = useInput("");
+    const model = useInput("");
     const [vehicle, setVehicle] = useState("limousine");
     const [gearbox, setGearbox] = useState("manuell");
-    const [kilo] = useInput("");
-    const [power] = useInput("");
+    const kilo = useInput("");
+    const power = useInput("");
     const [fueltype, setFueltype] = useState("benzin");
     const [notrepaireddamage, setNotrepaireddamage] = useState("nein");
     const [searchResults, setSearchResults] = useState([]);
@@ -121,10 +110,10 @@ const App = () => {
         e.preventDefault();
         try {
             const response = await fetch(
-                `https://elk.maxsoft.shop/?yearofregistration=${year.value}&brand=${brand}&model=${model.value}&vehicletype=${vehicle}&gearbox=${gearbox}&kilometer=${kilo.value}&powerps=${power.value}&fueltype=${fueltype}&notrepaireddamage=${notrepaireddamage}`
+                `/api/search?yearofregistration=${year.value}&brand=${brand}&model=${model.value}&vehicletype=${vehicle}&gearbox=${gearbox}&kilometer=${kilo.value}&powerps=${power.value}&fueltype=${fueltype}&notrepaireddamage=${notrepaireddamage}`
             );
             const data = await response.json();
-            setSearchResults([data]);
+            setSearchResults(data);
         } catch (error) {
             console.error("Error fetching search results:", error);
         }
@@ -246,21 +235,21 @@ const App = () => {
                                 <CardMedia
                                     component="img"
                                     height="140"
-                                    image={`https://source.unsplash.com/featured/?car,${brand}`}
-                                    alt={`${brand} ${model.value}`}
+                                    image={`https://source.unsplash.com/featured/?car,${result.brand}`}
+                                    alt={`${result.brand} ${result.model}`}
                                 />
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div">
-                                        {capitalize(brand)} {model.value}
+                                        {capitalize(result.brand)} {result.model}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         Price: {Math.round(result.price)} EUR
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Year: {year.value}
+                                        Year: {result.yearofregistration}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Mileage: {kilo.value} km
+                                        Mileage: {result.kilometer} km
                                     </Typography>
                                 </CardContent>
                             </Card>
@@ -272,7 +261,7 @@ const App = () => {
     );
 
     return (
-        <ThemeProvider theme={createTheme({ palette: { type: darkMode ? "dark" : "light" } })}>
+        <ThemeProvider theme={createTheme({ palette: { mode: darkMode ? "dark" : "light" } })}>
             <Router>
                 <div className="App">
                     <Container>
@@ -290,10 +279,10 @@ const App = () => {
                                 </Button>
                             </nav>
                         </header>
-                        <Switch>
-                            <Route exact path="/" component={Home} />
-                            <Route path="/search" component={Search} />
-                        </Switch>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/search" element={<Search />} />
+                        </Routes>
                     </Container>
                 </div>
             </Router>

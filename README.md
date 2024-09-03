@@ -48,5 +48,4 @@ cars-market/
 
 # TODO
 
--   load autos.csv in server folder to Mongo DB on first run
--   fix ERROR in ./src/App.js 673:41-47 export 'Switch' (imported as 'Switch') was not found in 'react-router-dom' (
+-   fix ERROR in ./src/App.js 24:17-25 export 'useInput' (imported as 'useInput') was not found in './useInput' (possible exports: default)
