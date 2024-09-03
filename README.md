@@ -40,5 +40,5 @@ cars-market/
 
 # TODO
 
--   remove debouncedSearch and put back normal Search button
--   show car images also on cards
+-   show car images also in search window (similar to card view)
+-   fix dark thene

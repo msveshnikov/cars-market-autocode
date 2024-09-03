@@ -296,16 +296,16 @@ const App = () => {
             {searchResults.length > 0 && (
                 <Grid container spacing={2} style={{ marginTop: "20px" }}>
                     {searchResults.map((result) => (
-                        <Grid item xs={12} sm={6} md={4} key={result._id}>
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={result._id}>
                             <Card component={Link} to={`/car/${result._id}`} style={{ textDecoration: "none" }}>
                                 <CardMedia
                                     component="img"
-                                    height="140"
+                                    height="120"
                                     image={result.image || `https://source.unsplash.com/featured/?car,${result.brand}`}
                                     alt={`${result.brand} ${result.model}`}
                                 />
                                 <CardContent>
-                                    <Typography gutterBottom variant="h5" component="div">
+                                    <Typography variant="subtitle1" component="div">
                                         {capitalize(result.brand)} {result.model}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
