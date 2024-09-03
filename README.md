@@ -56,4 +56,4 @@ cars-market/
 # TODO
 
 -   add car images (from unsplash or google search)
--   when press on card, open car details page
+-   add nice landing page with designs and sleek and some car images hero

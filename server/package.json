@@ -1,6 +1,7 @@
 {
     "name": "cars-market-server",
     "version": "1.0.0",
+    "type": "module",
     "description": "Backend server for Cars Market application",
     "main": "index.js",
     "scripts": {
