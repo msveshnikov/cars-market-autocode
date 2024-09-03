@@ -40,4 +40,5 @@ cars-market/
 
 # TODO
 
--   load image in /car endpoint, not in csv parse
+-   remove debouncedSearch and put back normal Search button
+-   show car images also on cards

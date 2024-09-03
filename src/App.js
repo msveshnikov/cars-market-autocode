@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useInput } from "./useInput";
 import {
     TextField,
@@ -30,7 +30,6 @@ import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import debounce from "lodash/debounce";
 
 const App = () => {
     const year = useInput("");
@@ -98,45 +97,27 @@ const App = () => {
         setBrand(event.target.value);
     };
 
-    const debouncedSearch = useCallback(
-        debounce(async (searchParams) => {
-            try {
-                const queryString = new URLSearchParams(searchParams).toString();
-                const response = await fetch(`http://localhost:5000/api/search?${queryString}`);
-                const data = await response.json();
-                setSearchResults(data);
-            } catch (error) {
-                console.error("Error fetching search results:", error);
-            }
-        }, 3000),
-        []
-    );
-
-    useEffect(() => {
-        const searchParams = {
-            yearofregistration: year.value,
-            brand,
-            model: model.value,
-            vehicletype: vehicle,
-            gearbox,
-            kilometer: kilo.value,
-            powerps: power.value,
-            fueltype,
-            notrepaireddamage,
-        };
-        debouncedSearch(searchParams);
-    }, [
-        year.value,
-        brand,
-        model.value,
-        vehicle,
-        gearbox,
-        kilo.value,
-        power.value,
-        fueltype,
-        notrepaireddamage,
-        debouncedSearch,
-    ]);
+    const handleSearch = async () => {
+        try {
+            const searchParams = {
+                yearofregistration: year.value,
+                brand,
+                model: model.value,
+                vehicletype: vehicle,
+                gearbox,
+                kilometer: kilo.value,
+                powerps: power.value,
+                fueltype,
+                notrepaireddamage,
+            };
+            const queryString = new URLSearchParams(searchParams).toString();
+            const response = await fetch(`http://localhost:5000/api/search?${queryString}`);
+            const data = await response.json();
+            setSearchResults(data);
+        } catch (error) {
+            console.error("Error fetching search results:", error);
+        }
+    };
 
     function capitalize(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -305,6 +286,11 @@ const App = () => {
                             <MenuItem value={"ja"}>Yes</MenuItem>
                         </Select>
                     </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                    <Button variant="contained" color="primary" onClick={handleSearch}>
+                        Search
+                    </Button>
                 </Grid>
             </Grid>
             {searchResults.length > 0 && (
