@@ -1,0 +1,98 @@
+/* Global styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+}
+
+/* Dark mode styles */
+.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Light mode styles */
+.light-mode {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Container styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+}
+
+/* Transitions for smooth theme changes */
+body,
+.MuiPaper-root,
+.MuiCard-root,
+.MuiAppBar-root {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Accessibility improvements */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus styles for keyboard navigation */
+:focus {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (forced-colors: active) {
+    .MuiButton-root {
+        forced-color-adjust: none;
+        background-color: ButtonFace;
+        color: ButtonText;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background-color: #ffffff;
+        color: #000000;
+    }
+
+    .no-print {
+        display: none;
+    }
+}

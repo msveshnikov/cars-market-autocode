@@ -148,3 +148,11 @@ cars-market/
     - Implement automated testing and deployment to staging and production environments
 
 These new design ideas and considerations aim to enhance the Cars Market application, improving user experience, performance, and functionality while considering the current project structure and best practices in modern web development.
+
+
+# TODO
+
+-   fix dark theme (apply to App.css)
+-   user login and profiles
+-   integrate with external API
+-   scrape auto buysell sites
