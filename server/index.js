@@ -101,9 +101,9 @@ app.use(
 
 app.post("/api/register", async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, password: hashedPassword });
+        const user = new User({ username, email, password: hashedPassword });
         await user.save();
         res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
@@ -114,17 +114,17 @@ app.post("/api/register", async (req, res) => {
 
 app.post("/api/login", async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const user = await User.findOne({ username });
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await user.comparePassword(password);
         if (!isPasswordValid) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-        res.json({ token });
+        res.json({ token, userId: user._id });
     } catch (error) {
         logger.error("Error logging in:", error);
         res.status(500).json({ message: error.message });
@@ -235,7 +235,7 @@ app.get("/api/models", async (req, res) => {
 app.post("/api/favorites", authMiddleware, async (req, res) => {
     try {
         const { carId } = req.body;
-        const user = await User.findById(req.userId);
+        const user = await User.findById(req.user._id);
         if (!user.favorites.includes(carId)) {
             user.favorites.push(carId);
             await user.save();
@@ -249,7 +249,7 @@ app.post("/api/favorites", authMiddleware, async (req, res) => {
 
 app.get("/api/favorites", authMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.userId).populate("favorites");
+        const user = await User.findById(req.user._id).populate("favorites");
         res.json(user.favorites);
     } catch (error) {
         logger.error("Error fetching favorites:", error);
@@ -260,7 +260,7 @@ app.get("/api/favorites", authMiddleware, async (req, res) => {
 app.delete("/api/favorites/:carId", authMiddleware, async (req, res) => {
     try {
         const { carId } = req.params;
-        const user = await User.findById(req.userId);
+        const user = await User.findById(req.user._id);
         user.favorites = user.favorites.filter((id) => id.toString() !== carId);
         await user.save();
         res.json({ message: "Car removed from favorites" });

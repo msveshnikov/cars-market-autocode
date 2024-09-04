@@ -25,9 +25,11 @@
         nav ul {
             list-style-type: none;
             padding: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         nav ul li {
-            display: inline;
             margin-right: 20px;
         }
         nav ul li a {
@@ -156,6 +158,26 @@
             text-align: center;
             padding: 40px 0;
         }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .social-icons a {
+            color: white;
+            font-size: 24px;
+            margin: 0 10px;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: white;
+        }
+        .dark-mode .car-card {
+            background-color: #444;
+        }
+        .dark-mode .car-title {
+            color: white;
+        }
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5em;
@@ -178,6 +200,7 @@
                     <li><a href="#features">Features</a></li>
                     <li><a href="#search">Search</a></li>
                     <li><a href="#contact">Contact</a></li>
+                    <li><a href="#" id="darkModeToggle">Toggle Dark Mode</a></li>
                 </ul>
             </nav>
         </div>
@@ -206,6 +229,14 @@
                 <div class="feature">
                     <h3>High-Quality Images</h3>
                     <p>View detailed, high-resolution car images sourced from Google Images</p>
+                </div>
+                <div class="feature">
+                    <h3>Dark Mode</h3>
+                    <p>Customize your browsing experience with our dark mode option</p>
+                </div>
+                <div class="feature">
+                    <h3>Favorites and Comparison</h3>
+                    <p>Save your favorite cars and compare different models side by side</p>
                 </div>
             </div>
         </section>
@@ -255,7 +286,23 @@
         <div class="container">
             <p>&copy; 2023 Cars Market. All rights reserved.</p>
             <p>Contact: info@carsmarket.com | Phone: (555) 123-4567</p>
+            <div class="social-icons">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
         </div>
     </footer>
+
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        darkModeToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            body.classList.toggle('dark-mode');
+        });
+    </script>
 </body>
 </html>

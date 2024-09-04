@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
     lastLogin: {
         type: Date,
     },
+    darkMode: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 userSchema.pre("save", async function (next) {
@@ -46,6 +50,23 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.addToFavorites = async function (carId) {
+    if (!this.favorites.includes(carId)) {
+        this.favorites.push(carId);
+        await this.save();
+    }
+};
+
+userSchema.methods.removeFromFavorites = async function (carId) {
+    this.favorites = this.favorites.filter((id) => id.toString() !== carId.toString());
+    await this.save();
+};
+
+userSchema.methods.toggleDarkMode = async function () {
+    this.darkMode = !this.darkMode;
+    await this.save();
 };
 
 const User = mongoose.model("User", userSchema);
