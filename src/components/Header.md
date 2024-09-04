@@ -8,10 +8,10 @@ This component is located in `src/components/Header.js` and is likely used in th
 
 ## Dependencies
 
-- React
-- Material-UI components (`@mui/material`)
-- React Router (`react-router-dom`)
-- Material-UI icons (`@mui/icons-material`)
+-   React
+-   Material-UI components (`@mui/material`)
+-   React Router (`react-router-dom`)
+-   Material-UI icons (`@mui/icons-material`)
 
 ## Component Structure
 
@@ -21,8 +21,8 @@ The `Header` component is a stateless functional component that uses Material-UI
 
 The component accepts two props:
 
-- `darkMode` (boolean): Indicates whether the application is in dark mode.
-- `toggleDarkMode` (function): A callback function to toggle the dark mode state.
+-   `darkMode` (boolean): Indicates whether the application is in dark mode.
+-   `toggleDarkMode` (function): A callback function to toggle the dark mode state.
 
 ## Functionality
 
@@ -35,18 +35,18 @@ The component accepts two props:
 ## Usage
 
 ```jsx
-import Header from './components/Header';
+import Header from "./components/Header";
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
-  const toggleDarkMode = () => setDarkMode(!darkMode);
+    const [darkMode, setDarkMode] = useState(false);
+    const toggleDarkMode = () => setDarkMode(!darkMode);
 
-  return (
-    <div className="App">
-      <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-      {/* Rest of the application */}
-    </div>
-  );
+    return (
+        <div className="App">
+            <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            {/* Rest of the application */}
+        </div>
+    );
 }
 ```
 
@@ -54,10 +54,10 @@ function App() {
 
 The `Header` component uses Material-UI's `AppBar` and `Toolbar` components to create the navigation bar structure. It includes:
 
-- An `IconButton` with a home icon that links to the home page.
-- A `Typography` component displaying the application title "Cars Market".
-- Three `Button` components for Search, Favorites, and Compare features, each with an associated icon and link.
-- An `IconButton` for toggling between light and dark modes, which changes its icon based on the current mode.
+-   An `IconButton` with a home icon that links to the home page.
+-   A `Typography` component displaying the application title "Cars Market".
+-   Three `Button` components for Search, Favorites, and Compare features, each with an associated icon and link.
+-   An `IconButton` for toggling between light and dark modes, which changes its icon based on the current mode.
 
 Each navigation item uses the `Link` component from React Router to handle client-side routing.
 
@@ -69,10 +69,10 @@ The component uses Material-UI's `sx` prop for inline styling and leverages Mate
 
 This `Header` component plays a crucial role in the application's layout and navigation:
 
-- It's likely rendered in the main `App.js` file or a layout component.
-- It interacts with the routing defined in the application (probably in `App.js` or a separate router file).
-- The dark mode functionality likely uses the `useDarkMode` hook located in `src/hooks/useDarkMode.js`.
-- The navigation buttons correspond to other main components in the `src/components` directory (Home, Search, Favorites, Compare).
+-   It's likely rendered in the main `App.js` file or a layout component.
+-   It interacts with the routing defined in the application (probably in `App.js` or a separate router file).
+-   The dark mode functionality likely uses the `useDarkMode` hook located in `src/hooks/useDarkMode.js`.
+-   The navigation buttons correspond to other main components in the `src/components` directory (Home, Search, Favorites, Compare).
 
 ## Conclusion
 

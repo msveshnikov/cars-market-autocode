@@ -12,7 +12,9 @@ services:
             - mongo
 
     server:
-        build: ./server
+        build:
+            context: ./server
+            dockerfile: Dockerfile
         ports:
             - "5000:5000"
         environment:
