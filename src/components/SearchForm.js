@@ -3,7 +3,7 @@ import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, Button } fr
 
 const SearchForm = ({ brands, onSearch }) => {
     const [formData, setFormData] = useState({
-        year: "",
+        yearofregistration: "",
         brand: "",
         model: "",
         vehicletype: "",
@@ -37,7 +37,7 @@ const SearchForm = ({ brands, onSearch }) => {
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <TextField fullWidth label="Year" name="year" value={formData.year} onChange={handleChange} />
+                    <TextField fullWidth label="yearofregistration" name="yearofregistration" value={formData.yearofregistration} onChange={handleChange} />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
                     <TextField
