@@ -1,59 +1,102 @@
-import Swal from "sweetalert2";
+import axios from "axios";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
-export const fetchBrands = async () => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/brands`);
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching brands:", error);
-        Swal.fire("Error", "Failed to fetch brands. Please try again later.", "error");
-        return [];
+const api = axios.create({
+    baseURL: API_BASE_URL,
+});
+
+export const setAuthToken = (token) => {
+    if (token) {
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    } else {
+        delete api.defaults.headers.common["Authorization"];
     }
 };
 
-export const fetchModels = async (brand) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/models?brand=${encodeURIComponent(brand)}`);
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching models:", error);
-        Swal.fire("Error", "Failed to fetch models. Please try again later.", "error");
-        return [];
-    }
+export const register = async (username, email, password) => {
+    const response = await api.post("/auth/register", { username, email, password });
+    return response.data;
 };
 
-export const searchCars = async (params) => {
-    try {
-        const queryString = new URLSearchParams(params).toString();
-        const response = await fetch(`${API_BASE_URL}/search?${queryString}`);
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching search results:", error);
-        Swal.fire("Error", "Failed to fetch search results. Please try again later.", "error");
-        return { cars: [], totalPages: 1 };
-    }
+export const login = async (email, password) => {
+    const response = await api.post("/auth/login", { email, password });
+    return response.data;
 };
 
-export const fetchCarDetails = async (id) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/cars/${id}`);
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching car details:", error);
-        Swal.fire("Error", "Failed to fetch car details. Please try again later.", "error");
-        return null;
-    }
+export const logout = async () => {
+    const response = await api.post("/auth/logout");
+    return response.data;
+};
+
+export const fetchCurrentUser = async () => {
+    const response = await api.get("/auth/me");
+    return response.data;
 };
 
 export const fetchCars = async (page = 1, limit = 50) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/cars?page=${page}&limit=${limit}`);
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching cars:", error);
-        Swal.fire("Error", "Failed to fetch cars. Please try again later.", "error");
-        return { cars: [], totalPages: 1, currentPage: 1 };
-    }
+    const response = await api.get("/cars", { params: { page, limit } });
+    return response.data;
 };
+
+export const searchCars = async (params) => {
+    const response = await api.get("/cars/search", { params });
+    return response.data;
+};
+
+export const fetchCarDetails = async (id) => {
+    const response = await api.get(`/cars/${id}`);
+    return response.data;
+};
+
+export const fetchBrands = async () => {
+    const response = await api.get("/cars/brands");
+    return response.data;
+};
+
+export const fetchModels = async (brand) => {
+    const response = await api.get("/cars/models", { params: { brand } });
+    return response.data;
+};
+
+export const addToFavorites = async (carId) => {
+    const response = await api.post("/favorites", { carId });
+    return response.data;
+};
+
+export const getFavorites = async () => {
+    const response = await api.get("/favorites");
+    return response.data;
+};
+
+export const removeFromFavorites = async (carId) => {
+    const response = await api.delete(`/favorites/${carId}`);
+    return response.data;
+};
+
+export const addToCompare = async (carId) => {
+    const response = await api.post("/compare", { carId });
+    return response.data;
+};
+
+export const getCompareList = async () => {
+    const response = await api.get("/compare");
+    return response.data;
+};
+
+export const removeFromCompare = async (carId) => {
+    const response = await api.delete(`/compare/${carId}`);
+    return response.data;
+};
+
+export const toggleDarkMode = async (isDarkMode) => {
+    const response = await api.post("/user/preferences", { darkMode: isDarkMode });
+    return response.data;
+};
+
+export const getUserPreferences = async () => {
+    const response = await api.get("/user/preferences");
+    return response.data;
+};
+
+export default api;

@@ -1,19 +1,48 @@
-import React, { useState } from "react";
-import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+    Grid,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Button,
+    Slider,
+    Typography,
+    Box,
+} from "@mui/material";
+import { fetchModels } from "../services/api";
 
 const SearchForm = ({ brands, onSearch }) => {
     const [formData, setFormData] = useState({
-        yearofregistration: "",
+        yearofregistration: [1900, new Date().getFullYear()],
         brand: "",
         model: "",
         vehicletype: "",
         gearbox: "",
         fueltype: "",
         notrepaireddamage: "",
+        kilometer: [0, 500000],
+        powerps: [0, 1000],
+        price: [0, 100000],
     });
+    const [models, setModels] = useState([]);
+
+    useEffect(() => {
+        if (formData.brand) {
+            fetchModels(formData.brand)
+                .then(setModels)
+                .catch((error) => console.error("Error fetching models:", error));
+        }
+    }, [formData.brand]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSliderChange = (name) => (event, newValue) => {
+        setFormData({ ...formData, [name]: newValue });
     };
 
     const handleSubmit = (e) => {
@@ -37,75 +66,110 @@ const SearchForm = ({ brands, onSearch }) => {
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <TextField fullWidth label="yearofregistration" name="yearofregistration" value={formData.yearofregistration} onChange={handleChange} />
+                    <FormControl fullWidth>
+                        <InputLabel>Model</InputLabel>
+                        <Select name="model" value={formData.model} onChange={handleChange}>
+                            {models.map((model) => (
+                                <MenuItem key={model} value={model}>
+                                    {model}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <TextField
-                        fullWidth
-                        label="Model"
-                        variant="outlined"
-                        name="model"
-                        type="text"
-                        value={formData.model}
-                        onChange={handleChange}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl fullWidth>
                         <InputLabel>Vehicle Type</InputLabel>
-                        <Select name="vehicle" value={formData.vehicle} onChange={handleChange} label="Vehicle Type">
-                            <MenuItem value={"limousine"}>Sedan</MenuItem>
-                            <MenuItem value={"coupe"}>Coupe</MenuItem>
-                            <MenuItem value={"kleinwagen"}>Hatchback</MenuItem>
-                            <MenuItem value={"suv"}>SUV</MenuItem>
-                            <MenuItem value={"kombi"}>Combi</MenuItem>
-                            <MenuItem value={"cabrio"}>Cabriolet</MenuItem>
-                            <MenuItem value={"bus"}>Bus</MenuItem>
-                            <MenuItem value={"andere"}>Other</MenuItem>
+                        <Select name="vehicletype" value={formData.vehicletype} onChange={handleChange}>
+                            <MenuItem value="limousine">Sedan</MenuItem>
+                            <MenuItem value="coupe">Coupe</MenuItem>
+                            <MenuItem value="kleinwagen">Hatchback</MenuItem>
+                            <MenuItem value="suv">SUV</MenuItem>
+                            <MenuItem value="kombi">Combi</MenuItem>
+                            <MenuItem value="cabrio">Cabriolet</MenuItem>
+                            <MenuItem value="bus">Bus</MenuItem>
+                            <MenuItem value="andere">Other</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl fullWidth>
                         <InputLabel>Gearbox</InputLabel>
-                        <Select name="gearbox" value={formData.gearbox} onChange={handleChange} label="Gearbox">
-                            <MenuItem value={"manuell"}>Manual</MenuItem>
-                            <MenuItem value={"automatik"}>Automatic</MenuItem>
+                        <Select name="gearbox" value={formData.gearbox} onChange={handleChange}>
+                            <MenuItem value="manuell">Manual</MenuItem>
+                            <MenuItem value="automatik">Automatic</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl fullWidth>
                         <InputLabel>Fuel Type</InputLabel>
-                        <Select name="fueltype" value={formData.fueltype} onChange={handleChange} label="Fuel Type">
-                            <MenuItem value={"benzin"}>Gasoline</MenuItem>
-                            <MenuItem value={"diesel"}>Diesel</MenuItem>
-                            <MenuItem value={"hybrid"}>Hybrid</MenuItem>
-                            <MenuItem value={"lpg"}>LPG</MenuItem>
-                            <MenuItem value={"cng"}>CNG</MenuItem>
-                            <MenuItem value={"elektro"}>Electro</MenuItem>
-                            <MenuItem value={"andere"}>Other</MenuItem>
+                        <Select name="fueltype" value={formData.fueltype} onChange={handleChange}>
+                            <MenuItem value="benzin">Gasoline</MenuItem>
+                            <MenuItem value="diesel">Diesel</MenuItem>
+                            <MenuItem value="hybrid">Hybrid</MenuItem>
+                            <MenuItem value="lpg">LPG</MenuItem>
+                            <MenuItem value="cng">CNG</MenuItem>
+                            <MenuItem value="elektro">Electric</MenuItem>
+                            <MenuItem value="andere">Other</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl fullWidth>
                         <InputLabel>Damaged</InputLabel>
-                        <Select
-                            name="notrepaireddamage"
-                            value={formData.notrepaireddamage}
-                            onChange={handleChange}
-                            label="Damaged"
-                        >
-                            <MenuItem value={"nein"}>No</MenuItem>
-                            <MenuItem value={"ja"}>Yes</MenuItem>
+                        <Select name="notrepaireddamage" value={formData.notrepaireddamage} onChange={handleChange}>
+                            <MenuItem value="nein">No</MenuItem>
+                            <MenuItem value="ja">Yes</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                    <Button type="submit" variant="contained" color="primary">
-                        Search
-                    </Button>
+                    <Typography gutterBottom>Year of Registration</Typography>
+                    <Slider
+                        value={formData.yearofregistration}
+                        onChange={handleSliderChange("yearofregistration")}
+                        valueLabelDisplay="auto"
+                        min={1900}
+                        max={new Date().getFullYear()}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography gutterBottom>Mileage (km)</Typography>
+                    <Slider
+                        value={formData.kilometer}
+                        onChange={handleSliderChange("kilometer")}
+                        valueLabelDisplay="auto"
+                        min={0}
+                        max={500000}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography gutterBottom>Power (PS)</Typography>
+                    <Slider
+                        value={formData.powerps}
+                        onChange={handleSliderChange("powerps")}
+                        valueLabelDisplay="auto"
+                        min={0}
+                        max={1000}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography gutterBottom>Price (EUR)</Typography>
+                    <Slider
+                        value={formData.price}
+                        onChange={handleSliderChange("price")}
+                        valueLabelDisplay="auto"
+                        min={0}
+                        max={100000}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                        <Button type="submit" variant="contained" color="primary">
+                            Search
+                        </Button>
+                    </Box>
                 </Grid>
             </Grid>
         </form>

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Container, Typography, Grid, Button, Box, Pagination } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { Container, Typography, Grid, Box, Pagination, CircularProgress } from "@mui/material";
 import SearchForm from "./SearchForm";
 import CarCard from "./CarCard";
 import { fetchBrands, searchCars } from "../services/api";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Search = ({ favorites, toggleFavorite, compareList, toggleCompare }) => {
     const [searchParams, setSearchParams] = useState({});
@@ -12,12 +13,13 @@ const Search = ({ favorites, toggleFavorite, compareList, toggleCompare }) => {
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchBrands().then(setBrands).catch(console.error);
     }, []);
 
-    const handleSearch = async (params, pageNumber = 1) => {
+    const handleSearch = useCallback(async (params, pageNumber = 1) => {
         setLoading(true);
         try {
             const data = await searchCars({ ...params, page: pageNumber });
@@ -31,10 +33,14 @@ const Search = ({ favorites, toggleFavorite, compareList, toggleCompare }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     const handlePageChange = (event, value) => {
         handleSearch(searchParams, value);
+    };
+
+    const handleCarClick = (carId) => {
+        navigate(`/car/${carId}`);
     };
 
     return (
@@ -44,7 +50,9 @@ const Search = ({ favorites, toggleFavorite, compareList, toggleCompare }) => {
             </Typography>
             <SearchForm brands={brands} onSearch={handleSearch} />
             {loading ? (
-                <Typography>Loading...</Typography>
+                <Box display="flex" justifyContent="center" mt={4}>
+                    <CircularProgress />
+                </Box>
             ) : (
                 searchResults?.length > 0 && (
                     <>
@@ -57,6 +65,7 @@ const Search = ({ favorites, toggleFavorite, compareList, toggleCompare }) => {
                                         isCompare={compareList.some((item) => item._id === result._id)}
                                         onToggleFavorite={() => toggleFavorite(result)}
                                         onToggleCompare={() => toggleCompare(result)}
+                                        onClick={() => handleCarClick(result._id)}
                                     />
                                 </Grid>
                             ))}
