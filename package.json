@@ -20,11 +20,6 @@
         "dev": "concurrently \"npm start\" \"npm run server\"",
         "lint": "eslint ."
     },
-    "eslintConfig": {
-        "extends": [
-            "react-app"
-        ]
-    },
     "browserslist": {
         "production": [
             ">0.2%",
