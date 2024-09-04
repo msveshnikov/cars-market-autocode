@@ -16,6 +16,11 @@ import i18nextMiddleware from "i18next-http-middleware";
 import Backend from "i18next-fs-backend";
 import winston from "winston";
 import expressWinston from "express-winston";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import authMiddleware from "./middleware/auth.js";
+import User from "./models/User.js";
+import Car from "./models/Cars.js";
 
 dotenv.config();
 
@@ -36,22 +41,6 @@ const limiter = rateLimit({
 app.use(limiter);
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/cars_market", {});
-
-const carSchema = new mongoose.Schema({
-    yearofregistration: Number,
-    brand: String,
-    model: String,
-    vehicletype: String,
-    gearbox: String,
-    kilometer: Number,
-    powerps: Number,
-    fueltype: String,
-    notrepaireddamage: String,
-    price: Number,
-    image: String,
-});
-
-const Car = mongoose.model("Car", carSchema);
 
 const collectDefaultMetrics = prometheus.collectDefaultMetrics;
 collectDefaultMetrics();
@@ -90,10 +79,6 @@ const logger = winston.createLogger({
     level: "info",
     format: winston.format.json(),
     defaultMeta: { service: "cars-market" },
-    transports: [
-        new winston.transports.File({ filename: "error.log", level: "error" }),
-        new winston.transports.File({ filename: "combined.log" }),
-    ],
 });
 
 if (process.env.NODE_ENV !== "production") {
@@ -113,6 +98,38 @@ app.use(
         colorize: false,
     })
 );
+
+app.post("/api/register", async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({ username, password: hashedPassword });
+        await user.save();
+        res.status(201).json({ message: "User registered successfully" });
+    } catch (error) {
+        logger.error("Error registering user:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.post("/api/login", async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        res.json({ token });
+    } catch (error) {
+        logger.error("Error logging in:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
 
 app.get("/api/cars", async (req, res) => {
     try {
@@ -213,6 +230,44 @@ app.get("/api/models", async (req, res) => {
     httpRequestDurationMicroseconds
         .labels(req.method, req.route.path, res.statusCode)
         .observe(Date.now() - res.locals.startEpoch);
+});
+
+app.post("/api/favorites", authMiddleware, async (req, res) => {
+    try {
+        const { carId } = req.body;
+        const user = await User.findById(req.userId);
+        if (!user.favorites.includes(carId)) {
+            user.favorites.push(carId);
+            await user.save();
+        }
+        res.json({ message: "Car added to favorites" });
+    } catch (error) {
+        logger.error("Error adding car to favorites:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.get("/api/favorites", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).populate("favorites");
+        res.json(user.favorites);
+    } catch (error) {
+        logger.error("Error fetching favorites:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.delete("/api/favorites/:carId", authMiddleware, async (req, res) => {
+    try {
+        const { carId } = req.params;
+        const user = await User.findById(req.userId);
+        user.favorites = user.favorites.filter((id) => id.toString() !== carId);
+        await user.save();
+        res.json({ message: "Car removed from favorites" });
+    } catch (error) {
+        logger.error("Error removing car from favorites:", error);
+        res.status(500).json({ message: error.message });
+    }
 });
 
 const getCarImage = async (brand, model) => {

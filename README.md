@@ -61,10 +61,3 @@ cars-market/
     ├── index.js
     └── package.json
 ```
-
-
-# TODO
-
--   user login and profiles
--   integrate with external API
--   scrape auto buysell sites
