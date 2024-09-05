@@ -65,7 +65,7 @@ const Login = () => {
                     <Box sx={{ mt: 2, textAlign: "center" }}>
                         <Link to="/signup" style={{ textDecoration: "none" }}>
                             <Typography variant="body2" color="primary">
-                                Don't have an account? Sign Up
+                                Don&apos;t have an account? Sign Up
                             </Typography>
                         </Link>
                     </Box>
