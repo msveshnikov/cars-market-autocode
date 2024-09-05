@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
 import { useCompare } from "../hooks/useCompare";
+import { useAuth } from "../hooks/useAuth";
 
 const Search = () => {
     const [searchParams, setSearchParams] = useState({});
@@ -16,8 +17,9 @@ const Search = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
-    const { favorites, toggleFavorite } = useFavorites();
-    const { compareList, toggleCompare } = useCompare();
+    const [favorites, toggleFavorite] = useFavorites();
+    const [compareList, toggleCompare] = useCompare();
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
         fetchBrands().then(setBrands).catch(console.error);
@@ -47,6 +49,14 @@ const Search = () => {
         navigate(`/car/${carId}`);
     };
 
+    const handleToggleFavorite = (car) => {
+        if (isAuthenticated) {
+            toggleFavorite(car);
+        } else {
+            Swal.fire("Error", "Please log in to add favorites", "error");
+        }
+    };
+
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Typography variant="h4" gutterBottom>
@@ -65,9 +75,9 @@ const Search = () => {
                                 <Grid item xs={12} sm={6} md={4} lg={3} key={result._id}>
                                     <CarCard
                                         car={result}
-                                        isFavorite={favorites?.some((fav) => fav._id === result._id)}
-                                        isCompare={compareList?.some((item) => item._id === result._id)}
-                                        onToggleFavorite={() => toggleFavorite(result)}
+                                        isFavorite={favorites.some((fav) => fav._id === result._id)}
+                                        isCompare={compareList.some((item) => item._id === result._id)}
+                                        onToggleFavorite={() => handleToggleFavorite(result)}
                                         onToggleCompare={() => toggleCompare(result)}
                                         onClick={() => handleCarClick(result._id)}
                                     />

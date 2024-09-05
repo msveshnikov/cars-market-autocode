@@ -1,11 +1,11 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Card, CardMedia, CardContent, Typography, Box, Button, IconButton, Tooltip } from "@mui/material";
 import { Link } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import LazyLoad from "react-lazyload";
 
-const CarCard = ({ car, isFavorite, isCompare, onToggleFavorite, onToggleCompare }) => (
+const CarCard = ({ car, isFavorite, onToggleFavorite, onClick }) => (
     <LazyLoad height={300} once>
         <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
             <CardMedia
@@ -13,6 +13,8 @@ const CarCard = ({ car, isFavorite, isCompare, onToggleFavorite, onToggleCompare
                 height="160"
                 image={car.image || `https://via.placeholder.com/300x200.png?text=${car.brand}+${car.model}`}
                 alt={`${car.brand} ${car.model}`}
+                onClick={() => onClick(car._id)}
+                sx={{ cursor: "pointer" }}
             />
             <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" component="div" gutterBottom>
@@ -37,15 +39,15 @@ const CarCard = ({ car, isFavorite, isCompare, onToggleFavorite, onToggleCompare
                 </Button>
                 <Box>
                     <Tooltip title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}>
-                        <IconButton onClick={onToggleFavorite} color={isFavorite ? "secondary" : "default"}>
+                        <IconButton onClick={() => onToggleFavorite(car)} color={isFavorite ? "secondary" : "default"}>
                             <FavoriteIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title={isCompare ? "Remove from Compare" : "Add to Compare"}>
-                        <IconButton onClick={onToggleCompare} color={isCompare ? "primary" : "default"}>
+                    {/* <Tooltip title={isCompare ? "Remove from Compare" : "Add to Compare"}>
+                        <IconButton onClick={() => onToggleCompare(car)} color={isCompare ? "primary" : "default"}>
                             <CompareArrowsIcon />
                         </IconButton>
-                    </Tooltip>
+                    </Tooltip> */}
                 </Box>
             </Box>
         </Card>

@@ -112,3 +112,6 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+# TODO
+
+-   fix toggleCompare is not a function when click from search (works from car card)
