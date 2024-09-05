@@ -127,44 +127,48 @@ const SearchForm = ({ brands, onSearch }) => {
                     </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                    <Typography gutterBottom>Year of Registration</Typography>
-                    <Slider
-                        value={formData.yearofregistration}
-                        onChange={handleSliderChange("yearofregistration")}
-                        valueLabelDisplay="auto"
-                        min={1900}
-                        max={new Date().getFullYear()}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography gutterBottom>Mileage (km)</Typography>
-                    <Slider
-                        value={formData.kilometer}
-                        onChange={handleSliderChange("kilometer")}
-                        valueLabelDisplay="auto"
-                        min={0}
-                        max={500000}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography gutterBottom>Power (PS)</Typography>
-                    <Slider
-                        value={formData.powerps}
-                        onChange={handleSliderChange("powerps")}
-                        valueLabelDisplay="auto"
-                        min={0}
-                        max={1000}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography gutterBottom>Price (EUR)</Typography>
-                    <Slider
-                        value={formData.price}
-                        onChange={handleSliderChange("price")}
-                        valueLabelDisplay="auto"
-                        min={0}
-                        max={100000}
-                    />
+                    <Grid container spacing={15}>
+                        <Grid item xs={3}>
+                            <Typography gutterBottom>Year</Typography>
+                            <Slider
+                                value={formData.yearofregistration}
+                                onChange={handleSliderChange("yearofregistration")}
+                                valueLabelDisplay="auto"
+                                min={1900}
+                                max={new Date().getFullYear()}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Typography gutterBottom>Mileage (km)</Typography>
+                            <Slider
+                                value={formData.kilometer}
+                                onChange={handleSliderChange("kilometer")}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={500000}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Typography gutterBottom>Power (PS)</Typography>
+                            <Slider
+                                value={formData.powerps}
+                                onChange={handleSliderChange("powerps")}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={1000}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Typography gutterBottom>Price (EUR)</Typography>
+                            <Slider
+                                value={formData.price}
+                                onChange={handleSliderChange("price")}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={100000}
+                            />
+                        </Grid>
+                    </Grid>
                 </Grid>
                 <Grid item xs={12}>
                     <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
