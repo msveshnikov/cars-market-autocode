@@ -114,4 +114,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 # TODO
 
--   fix toggleCompare is not a function when click from search (works from car card)
+-   fix Fix invalid credentials (password doesnt match) even if I send the same to /login and /register 

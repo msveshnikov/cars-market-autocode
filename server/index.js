@@ -16,7 +16,6 @@ import i18nextMiddleware from "i18next-http-middleware";
 import Backend from "i18next-fs-backend";
 import winston from "winston";
 import expressWinston from "express-winston";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import authMiddleware from "./middleware/auth.js";
 import User from "./models/User.js";
@@ -94,10 +93,10 @@ app.use(expressWinston.logger({ winstonInstance: logger }));
 app.post("/api/register", async (req, res) => {
     try {
         const { username, email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, email, password: hashedPassword });
+        const user = new User({ username, email, password });
         await user.save();
-        res.status(201).json({ message: "User registered successfully" });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        res.status(201).json({ token, userId: user._id });
     } catch (error) {
         logger.error("Error registering user:", error);
         res.status(500).json({ message: error.message });
@@ -109,11 +108,11 @@ app.post("/api/login", async (req, res) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(401).json({ message: "Invalid credentials" });
         }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await user.comparePassword(password);
         if (!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(401).json({ message: "Invalid credentials" });
         }
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
         res.json({ token, userId: user._id });
@@ -201,11 +200,7 @@ app.get("/api/models", async (req, res) => {
 app.post("/api/favorites", authMiddleware, async (req, res) => {
     try {
         const { carId } = req.body;
-        const user = await User.findById(req.user._id);
-        if (!user.favorites.includes(carId)) {
-            user.favorites.push(carId);
-            await user.save();
-        }
+        await req.user.addToFavorites(carId);
         res.json({ message: "Car added to favorites" });
     } catch (error) {
         logger.error("Error adding car to favorites:", error);
@@ -226,9 +221,7 @@ app.get("/api/favorites", authMiddleware, async (req, res) => {
 app.delete("/api/favorites/:carId", authMiddleware, async (req, res) => {
     try {
         const { carId } = req.params;
-        const user = await User.findById(req.user._id);
-        user.favorites = user.favorites.filter((id) => id.toString() !== carId);
-        await user.save();
+        await req.user.removeFromFavorites(carId);
         res.json({ message: "Car removed from favorites" });
     } catch (error) {
         logger.error("Error removing car from favorites:", error);
@@ -240,6 +233,9 @@ app.post("/api/compare", authMiddleware, async (req, res) => {
     try {
         const { carId } = req.body;
         const user = await User.findById(req.user._id);
+        if (!user.compareList) {
+            user.compareList = [];
+        }
         if (!user.compareList.includes(carId)) {
             user.compareList.push(carId);
             await user.save();
@@ -277,9 +273,7 @@ app.delete("/api/compare/:carId", authMiddleware, async (req, res) => {
 app.post("/api/user/preferences", authMiddleware, async (req, res) => {
     try {
         const { darkMode } = req.body;
-        const user = await User.findById(req.user._id);
-        user.preferences.darkMode = darkMode;
-        await user.save();
+        await req.user.toggleDarkMode();
         res.json({ message: "User preferences updated" });
     } catch (error) {
         logger.error("Error updating user preferences:", error);
@@ -289,8 +283,7 @@ app.post("/api/user/preferences", authMiddleware, async (req, res) => {
 
 app.get("/api/user/preferences", authMiddleware, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
-        res.json(user.preferences);
+        res.json({ darkMode: req.user.darkMode });
     } catch (error) {
         logger.error("Error fetching user preferences:", error);
         res.status(500).json({ message: error.message });

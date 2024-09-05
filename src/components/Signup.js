@@ -21,6 +21,11 @@ const Signup = () => {
             return;
         }
 
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters long");
+            return;
+        }
+
         try {
             await signup(username, email, password);
             navigate("/");

@@ -29,6 +29,12 @@ const userSchema = new mongoose.Schema({
             ref: "Car",
         },
     ],
+    compareList: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Car",
+        },
+    ],
     createdAt: {
         type: Date,
         default: Date.now,
@@ -36,15 +42,26 @@ const userSchema = new mongoose.Schema({
     lastLogin: {
         type: Date,
     },
-    darkMode: {
-        type: Boolean,
-        default: false,
+    preferences: {
+        darkMode: {
+            type: Boolean,
+            default: false,
+        },
     },
+    tokens: [
+        {
+            token: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
 });
 
 userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password, 10);
+    if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
     next();
 });
 
@@ -64,9 +81,28 @@ userSchema.methods.removeFromFavorites = async function (carId) {
     await this.save();
 };
 
-userSchema.methods.toggleDarkMode = async function () {
-    this.darkMode = !this.darkMode;
+userSchema.methods.addToCompareList = async function (carId) {
+    if (!this.compareList.includes(carId)) {
+        this.compareList.push(carId);
+        await this.save();
+    }
+};
+
+userSchema.methods.removeFromCompareList = async function (carId) {
+    this.compareList = this.compareList.filter((id) => id.toString() !== carId.toString());
     await this.save();
+};
+
+userSchema.methods.toggleDarkMode = async function () {
+    this.preferences.darkMode = !this.preferences.darkMode;
+    await this.save();
+};
+
+userSchema.methods.generateAuthToken = async function () {
+    const token = jwt.sign({ userId: this._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    this.tokens = this.tokens.concat({ token });
+    await this.save();
+    return token;
 };
 
 const User = mongoose.model("User", userSchema);
