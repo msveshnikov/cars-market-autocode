@@ -13,7 +13,7 @@
         "react-lazyload": "^3.2.1",
         "react-router-dom": "^6.26.1",
         "react-scripts": "5.0.1",
-        "sweetalert2": "^11.13.1"
+        "sweetalert2": "^11.13.2"
     },
     "scripts": {
         "start": "react-scripts start",
