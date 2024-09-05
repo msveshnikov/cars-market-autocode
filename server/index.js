@@ -79,25 +79,17 @@ const logger = winston.createLogger({
     level: "info",
     format: winston.format.json(),
     defaultMeta: { service: "cars-market" },
+    transports: [
+        new winston.transports.File({ filename: "error.log", level: "error" }),
+        new winston.transports.File({ filename: "combined.log" }),
+    ],
 });
 
 if (process.env.NODE_ENV !== "production") {
-    logger.add(
-        new winston.transports.Console({
-            format: winston.format.simple(),
-        })
-    );
+    logger.add(new winston.transports.Console({ format: winston.format.simple() }));
 }
 
-app.use(
-    expressWinston.logger({
-        winstonInstance: logger,
-        meta: true,
-        msg: "HTTP {{req.method}} {{req.url}}",
-        expressFormat: true,
-        colorize: false,
-    })
-);
+app.use(expressWinston.logger({ winstonInstance: logger }));
 
 app.post("/api/register", async (req, res) => {
     try {
@@ -119,7 +111,7 @@ app.post("/api/login", async (req, res) => {
         if (!user) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
-        const isPasswordValid = await user.comparePassword(password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
@@ -134,16 +126,8 @@ app.post("/api/login", async (req, res) => {
 app.get("/api/cars", async (req, res) => {
     try {
         const { page = 1, limit = 50 } = req.query;
-        const cars = await Car.find()
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec();
-        const count = await Car.countDocuments();
-        res.json({
-            cars,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page,
-        });
+        const result = await Car.findByFilters({}, page, limit);
+        res.json(result);
     } catch (error) {
         logger.error("Error fetching cars:", error);
         res.status(500).json({ message: error.message });
@@ -156,26 +140,8 @@ app.get("/api/cars", async (req, res) => {
 app.get("/api/search", async (req, res) => {
     try {
         const { page = 1, limit = 50, ...filters } = req.query;
-        const query = {};
-        for (const key in filters) {
-            if (filters[key]) {
-                if (["yearofregistration", "kilometer", "powerps", "price"].includes(key)) {
-                    query[key] = { $gte: Number(filters[key]) };
-                } else {
-                    query[key] = { $regex: new RegExp(filters[key], "i") };
-                }
-            }
-        }
-        const cars = await Car.find(query)
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec();
-        const count = await Car.countDocuments(query);
-        res.json({
-            cars,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page,
-        });
+        const result = await Car.findByFilters(filters, page, limit);
+        res.json(result);
     } catch (error) {
         logger.error("Error searching cars:", error);
         res.status(500).json({ message: error.message });
@@ -207,7 +173,7 @@ app.get("/api/cars/:id", async (req, res) => {
 
 app.get("/api/brands", async (req, res) => {
     try {
-        const brands = await Car.distinct("brand");
+        const brands = await Car.getDistinctBrands();
         res.json(brands);
     } catch (error) {
         logger.error("Error fetching brands:", error);
@@ -221,7 +187,7 @@ app.get("/api/brands", async (req, res) => {
 app.get("/api/models", async (req, res) => {
     try {
         const { brand } = req.query;
-        const models = await Car.distinct("model", { brand });
+        const models = await Car.getDistinctModels(brand);
         res.json(models);
     } catch (error) {
         logger.error("Error fetching models:", error);
@@ -266,6 +232,67 @@ app.delete("/api/favorites/:carId", authMiddleware, async (req, res) => {
         res.json({ message: "Car removed from favorites" });
     } catch (error) {
         logger.error("Error removing car from favorites:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.post("/api/compare", authMiddleware, async (req, res) => {
+    try {
+        const { carId } = req.body;
+        const user = await User.findById(req.user._id);
+        if (!user.compareList.includes(carId)) {
+            user.compareList.push(carId);
+            await user.save();
+        }
+        res.json({ message: "Car added to compare list" });
+    } catch (error) {
+        logger.error("Error adding car to compare list:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.get("/api/compare", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate("compareList");
+        res.json(user.compareList);
+    } catch (error) {
+        logger.error("Error fetching compare list:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.delete("/api/compare/:carId", authMiddleware, async (req, res) => {
+    try {
+        const { carId } = req.params;
+        const user = await User.findById(req.user._id);
+        user.compareList = user.compareList.filter((id) => id.toString() !== carId);
+        await user.save();
+        res.json({ message: "Car removed from compare list" });
+    } catch (error) {
+        logger.error("Error removing car from compare list:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.post("/api/user/preferences", authMiddleware, async (req, res) => {
+    try {
+        const { darkMode } = req.body;
+        const user = await User.findById(req.user._id);
+        user.preferences.darkMode = darkMode;
+        await user.save();
+        res.json({ message: "User preferences updated" });
+    } catch (error) {
+        logger.error("Error updating user preferences:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.get("/api/user/preferences", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        res.json(user.preferences);
+    } catch (error) {
+        logger.error("Error fetching user preferences:", error);
         res.status(500).json({ message: error.message });
     }
 });

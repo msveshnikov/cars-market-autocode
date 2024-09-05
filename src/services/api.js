@@ -15,22 +15,22 @@ export const setAuthToken = (token) => {
 };
 
 export const register = async (username, email, password) => {
-    const response = await api.post("/auth/register", { username, email, password });
+    const response = await api.post("/register", { username, email, password });
     return response.data;
 };
 
 export const login = async (email, password) => {
-    const response = await api.post("/auth/login", { email, password });
+    const response = await api.post("/login", { email, password });
     return response.data;
 };
 
 export const logout = async () => {
-    const response = await api.post("/auth/logout");
+    const response = await api.post("/logout");
     return response.data;
 };
 
 export const fetchCurrentUser = async () => {
-    const response = await api.get("/auth/me");
+    const response = await api.get("/me");
     return response.data;
 };
 
@@ -40,7 +40,7 @@ export const fetchCars = async (page = 1, limit = 50) => {
 };
 
 export const searchCars = async (params) => {
-    const response = await api.get("/cars/search", { params });
+    const response = await api.get("/search", { params });
     return response.data;
 };
 
@@ -50,12 +50,12 @@ export const fetchCarDetails = async (id) => {
 };
 
 export const fetchBrands = async () => {
-    const response = await api.get("/cars/brands");
+    const response = await api.get("/brands");
     return response.data;
 };
 
 export const fetchModels = async (brand) => {
-    const response = await api.get("/cars/models", { params: { brand } });
+    const response = await api.get("/models", { params: { brand } });
     return response.data;
 };
 

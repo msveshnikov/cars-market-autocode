@@ -5,8 +5,10 @@ import CarCard from "./CarCard";
 import { fetchBrands, searchCars } from "../services/api";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useFavorites } from "../hooks/useFavorites";
+import { useCompare } from "../hooks/useCompare";
 
-const Search = ({ favorites, toggleFavorite, compareList, toggleCompare }) => {
+const Search = () => {
     const [searchParams, setSearchParams] = useState({});
     const [searchResults, setSearchResults] = useState([]);
     const [brands, setBrands] = useState([]);
@@ -14,6 +16,8 @@ const Search = ({ favorites, toggleFavorite, compareList, toggleCompare }) => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
+    const { favorites, toggleFavorite } = useFavorites();
+    const { compareList, toggleCompare } = useCompare();
 
     useEffect(() => {
         fetchBrands().then(setBrands).catch(console.error);
@@ -61,8 +65,8 @@ const Search = ({ favorites, toggleFavorite, compareList, toggleCompare }) => {
                                 <Grid item xs={12} sm={6} md={4} lg={3} key={result._id}>
                                     <CarCard
                                         car={result}
-                                        isFavorite={favorites.some((fav) => fav._id === result._id)}
-                                        isCompare={compareList.some((item) => item._id === result._id)}
+                                        isFavorite={favorites?.some((fav) => fav._id === result._id)}
+                                        isCompare={compareList?.some((item) => item._id === result._id)}
                                         onToggleFavorite={() => toggleFavorite(result)}
                                         onToggleCompare={() => toggleCompare(result)}
                                         onClick={() => handleCarClick(result._id)}

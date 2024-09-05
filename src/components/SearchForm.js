@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    Grid,
-    TextField,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    Button,
-    Slider,
-    Typography,
-    Box,
-} from "@mui/material";
+import { Grid, FormControl, InputLabel, Select, MenuItem, Button, Slider, Typography, Box } from "@mui/material";
 import { fetchModels } from "../services/api";
 
 const SearchForm = ({ brands, onSearch }) => {
@@ -47,7 +36,20 @@ const SearchForm = ({ brands, onSearch }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSearch(formData);
+        const params = {
+            "yearofregistration[min]": formData.yearofregistration[0],
+            "yearofregistration[max]": formData.yearofregistration[1],
+            "kilometer[min]": formData.kilometer[0],
+            "kilometer[max]": formData.kilometer[1],
+            "powerps[min]": formData.powerps[0],
+            "powerps[max]": formData.powerps[1],
+            "price[min]": formData.price[0],
+            "price[max]": formData.price[1],
+            ...Object.fromEntries(
+                Object.entries(formData).filter(([key, value]) => !Array.isArray(value) && value !== "")
+            ),
+        };
+        onSearch(params);
     };
 
     return (
