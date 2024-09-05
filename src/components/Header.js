@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { AppBar, Toolbar, IconButton, Typography, Button, Box } from "@mui/material";
 import { Link } from "react-router-dom";

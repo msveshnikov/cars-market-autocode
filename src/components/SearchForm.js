@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { Grid, FormControl, InputLabel, Select, MenuItem, Button, Slider, Typography, Box } from "@mui/material";
 import { fetchModels } from "../services/api";
 
@@ -46,7 +47,7 @@ const SearchForm = ({ brands, onSearch }) => {
             "price[min]": formData.price[0],
             "price[max]": formData.price[1],
             ...Object.fromEntries(
-                Object.entries(formData).filter(([key, value]) => !Array.isArray(value) && value !== "")
+                Object.entries(formData).filter(([, value]) => !Array.isArray(value) && value !== "")
             ),
         };
         onSearch(params);
@@ -180,6 +181,11 @@ const SearchForm = ({ brands, onSearch }) => {
             </Grid>
         </form>
     );
+};
+
+SearchForm.propTypes = {
+    brands: PropTypes.arrayOf(PropTypes.string).isRequired,
+    onSearch: PropTypes.func.isRequired,
 };
 
 export default SearchForm;

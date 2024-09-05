@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Container, Typography, Grid } from "@mui/material";
 import CarCard from "./CarCard";
 
@@ -16,5 +17,10 @@ const Favorites = ({ favorites, toggleFavorite }) => (
         </Grid>
     </Container>
 );
+
+Favorites.propTypes = {
+    favorites: PropTypes.arrayOf(PropTypes.object).isRequired,
+    toggleFavorite: PropTypes.func.isRequired,
+};
 
 export default Favorites;
