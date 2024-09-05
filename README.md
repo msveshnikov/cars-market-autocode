@@ -29,6 +29,7 @@ Cars Market is a comprehensive web application for browsing, searching, and mana
 -   Responsive design for mobile and desktop
 -   Social media integration
 -   Performance optimization with lazy loading and code splitting
+-   Custom hooks for reusable logic (useAuth, useCompare, useDarkMode, useFavorites)
 
 ## Project Structure
 
@@ -51,6 +52,7 @@ cars-market/
 │   ├── services/
 │   │   └── api.js
 │   ├── hooks/
+│   │   ├── useAuth.js
 │   │   ├── useCompare.js
 │   │   ├── useDarkMode.js
 │   │   └── useFavorites.js
@@ -103,6 +105,28 @@ cars-market/
 -   Implement a review and rating system for cars and sellers
 -   Implement progressive web app (PWA) features
 -   Integrate with external APIs for additional car data and pricing information
+-   Implement WebSocket for real-time updates on car availability and pricing
+-   Add a chat feature for direct communication between buyers and sellers
+-   Implement a notification system for price drops, new listings, and saved searches
+-   Create a mobile app using React Native for iOS and Android platforms
+-   Implement A/B testing for UI/UX improvements
+-   Add analytics tracking for user behavior and conversion optimization
+-   Implement a blog section for car-related content and SEO improvement
+-   Create a dealer portal for managing inventory and customer interactions
+
+## Design Considerations
+
+-   Implement a design system for consistent UI components and styling
+-   Implement skeleton loading screens for improved perceived performance
+-   Use lazy loading for images and components to reduce initial load time
+-   Implement infinite scrolling for car listings to improve performance and user experience
+-   Use React.memo and useCallback for performance optimization of frequently re-rendered components
+-   Implement error boundaries for graceful error handling in the UI
+-   Use React Suspense for code-splitting and data fetching
+-   Implement a robust state management solution (e.g., Redux Toolkit or Recoil) for complex state logic
+-   Use React Testing Library for component testing and Cypress for end-to-end testing
+-   Implement continuous integration and continuous deployment (CI/CD) pipelines
+-   Use environment variables for configuration management across different environments
 
 ## Contributing
 
@@ -112,6 +136,10 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# TODO
+## TODO
 
--   fix Fix invalid credentials (password doesnt match) even if I send the same to /login and /register 
+-   Implement form validation and error handling for login and registration processes
+-   Add unit tests for authentication-related components and hooks
+-   Implement password reset functionality
+-   Add email verification for new user registrations
+-   Implement OAuth 2.0 for social media login options

@@ -272,7 +272,7 @@ app.delete("/api/compare/:carId", authMiddleware, async (req, res) => {
 
 app.post("/api/user/preferences", authMiddleware, async (req, res) => {
     try {
-        const { darkMode } = req.body;
+        // const { darkMode } = req.body;
         await req.user.toggleDarkMode();
         res.json({ message: "User preferences updated" });
     } catch (error) {

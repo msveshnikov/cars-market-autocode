@@ -98,13 +98,6 @@ userSchema.methods.toggleDarkMode = async function () {
     await this.save();
 };
 
-userSchema.methods.generateAuthToken = async function () {
-    const token = jwt.sign({ userId: this._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    this.tokens = this.tokens.concat({ token });
-    await this.save();
-    return token;
-};
-
 const User = mongoose.model("User", userSchema);
 
 export default User;
