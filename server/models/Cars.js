@@ -4,50 +4,36 @@ const carSchema = new mongoose.Schema(
     {
         yearofregistration: {
             type: Number,
-            required: true,
             index: true,
         },
         brand: {
             type: String,
-            required: true,
             index: true,
         },
         model: {
             type: String,
-            required: true,
             index: true,
         },
         vehicletype: {
             type: String,
-            required: true,
-            enum: ["limousine", "coupe", "kleinwagen", "suv", "kombi", "cabrio", "bus", "andere"],
         },
         gearbox: {
             type: String,
-            required: true,
-            enum: ["manuell", "automatik"],
         },
         kilometer: {
             type: Number,
-            required: true,
         },
         powerps: {
             type: Number,
-            required: true,
         },
         fueltype: {
             type: String,
-            required: true,
-            enum: ["benzin", "diesel", "hybrid", "lpg", "cng", "elektro", "andere"],
         },
         notrepaireddamage: {
             type: String,
-            required: true,
-            enum: ["ja", "nein"],
         },
         price: {
             type: Number,
-            required: true,
         },
         image: {
             type: String,

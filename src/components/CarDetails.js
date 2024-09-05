@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Typography, Grid, Card, CardMedia, Button, Box, CircularProgress, Snackbar } from "@mui/material";
@@ -83,11 +84,11 @@ const CarDetails = ({ favorites, toggleFavorite, compareList, toggleCompare }) =
                 {car.brand} {car.model}
             </Typography>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={3} md={3}>
                     <Card>
                         <CardMedia
                             component="img"
-                            height="400"
+                            height="200"
                             image={
                                 car.image || `https://via.placeholder.com/300x200.png?text=${car.brand}+${car.model}`
                             }
